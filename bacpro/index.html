@@ -680,6 +680,7 @@ function renderGivens(q){
  if(!gs.length)return '';
  const norm=s=>String(s??'').toLowerCase().replace(/[,]/g,'.').replace(/\s+/g,' ').trim();
  const nums=s=>[...String(s??'').replace(/\s(?=\d{3}\b)/g,'').matchAll(/[-+]?\d+(?:[.,]\d+)?/g)].map(m=>Number(m[0].replace(',','.'))).filter(Number.isFinite);
+ const reEsc=s=>String(s??'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  const qText=norm(q.q);
  const filtered=gs.filter(line=>{
    const txt=norm(line);
@@ -692,17 +693,13 @@ function renderGivens(q){
    if((q.type||'mcq')==='numeric'){
      const isFormula=/^(relation|conversion|formule|modèle|loi|cas)\s*:/i.test(String(line).trim());
      const vals=nums(line),ans=Number(q.answer_num),tol=Math.max(Number(q.tolerance||0),Math.abs(ans)*1e-6);
-     const reEsc=s=>String(s??'').replace(/[.*+?^$()|[\]\\{}]/g,'\\   if((q.type||'mcq')==='numeric'){
-     const isFormula=/^(relation|conversion|formule|modèle|loi|cas)\s*:/i.test(String(line).trim());
-     const vals=nums(line),ans=Number(q.answer_num),tol=Math.max(Number(q.tolerance||0),Math.abs(ans)*1e-6);
-     if(!isFormula&&vals.length===1&&Math.abs(vals[0]-ans)<=tol&&!qText.includes(String(vals[0])))return false;
-   }');
      const unit=String(q.unit||'').trim();
+     const unitAtLineEnd=!unit||new RegExp('\\s*'+reEsc(unit)+'\\s*$','i').test(String(line).trim());
      const ansCore=Number.isInteger(ans)?String(ans)+'(?:[\\.,]0+)?':String(ans).replace('.', '[\\.,]');
      const sameValueUnitInQuestion=unit
        ? new RegExp('(^|[^0-9])'+ansCore+'\\s*'+reEsc(unit)+'(?=$|[^A-Za-z0-9])','i').test(String(q.q||''))
        : new RegExp('(^|[^0-9])'+ansCore+'(?=$|[^0-9])').test(String(q.q||''));
-     if(!isFormula&&vals.length===1&&Math.abs(vals[0]-ans)<=tol&&!sameValueUnitInQuestion)return false;
+     if(!isFormula&&unitAtLineEnd&&vals.length===1&&Math.abs(vals[0]-ans)<=tol&&!sameValueUnitInQuestion)return false;
    }
    if((q.type||'mcq')==='mcq'&&Array.isArray(q.choices)&&Number.isInteger(q.answer)){
      const good=norm(q.choices[q.answer]);
