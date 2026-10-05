@@ -2,10 +2,19 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SI BTS">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#08111e">
 <title>SI Libre BTS — Entraînement libre en Sciences de l’Ingénieur</title>
 <meta name="description" content="Entraînements libres, ludiques et rigoureux en Sciences de l’Ingénieur : mécanique, énergie, électricité, automatique, numérique, mesure et ingénierie système.">
 <style>
+
+.skip-link{position:fixed;left:12px;top:12px;z-index:9999;padding:10px 14px;border-radius:10px;background:#fff;color:#07101d;font-weight:800;transform:translateY(-180%)}.skip-link:focus{transform:translateY(0)}
 :root{--bg:#07101d;--panel:#0f1b2d;--panel2:#132239;--line:#223653;--text:#f6f9ff;--muted:#9bacc3;--cyan:#66dcff;--blue:#7b9fff;--green:#4adea3;--yellow:#ffd166;--red:#ff7288;--r:22px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 15% -10%,#12345c 0,transparent 30%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 button{font:inherit}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:24px;padding:13px clamp(16px,4vw,54px);background:rgba(7,16,29,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}.brand{display:flex;align-items:center;gap:11px;color:inherit;text-decoration:none}.logo{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#06101a;font-weight:900;font-size:22px}.brand span:last-child{display:flex;flex-direction:column}.brand small{font-size:10px;color:var(--muted)}nav{display:flex;gap:4px;margin-left:auto}nav button{background:transparent;color:var(--muted);border:0;padding:9px 10px;cursor:pointer;border-radius:10px}nav button:hover{background:#132238;color:#fff}.xp{padding:9px 13px;border-radius:999px;background:#132238;border:1px solid var(--line);font-size:13px}
@@ -178,14 +187,14 @@ sub{font-size:.72em;vertical-align:-.28em;line-height:0}
 .givens-box li{margin:3px 0;line-height:1.35}
 </style>
 </head>
-<body>
+<body><a class="skip-link" href="#mainContent">Aller au contenu principal</a>
 <header class="topbar">
   <a class="brand" href="#accueil"><span class="logo">Σ</span><span><strong>SI Libre BTS</strong><small>Analyser • Modéliser • Résoudre • Valider</small></span></a>
   <nav><button data-go="parcours">Parcours</button><button data-go="missions">Missions</button></nav>
   <button id="formulaBtn" class="formula-btn" type="button" aria-haspopup="dialog">Formulaire SI</button><button id="toolsBtn" class="tools-btn" type="button" aria-haspopup="dialog">Outils</button><button id="installBtn" class="install-btn" type="button" hidden>Installer</button><div class="xp"><strong id="xp">0</strong> XP</div>
 </header>
 
-<main id="accueil">
+<main id="mainContent" id="accueil">
 <section class="hero">
  <div class="hero-copy">
   <span class="eyebrow">GRATUIT • SANS COMPTE • PROGRESSION LOCALE</span>
