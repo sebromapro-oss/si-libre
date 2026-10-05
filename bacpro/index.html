@@ -684,10 +684,15 @@ function renderGivens(q){
  const filtered=gs.filter(line=>{
    const txt=norm(line);
    if(!txt)return false;
+   if(/^distance \/ longueur\s*:/.test(txt)){
+     const vals=nums(line);
+     if(vals.length===1&&qText.includes(String(vals[0])))return false;
+   }
    if(/^(objectif|objectif spécifique|système étudié|système)\s*:/.test(txt))return false;
    if((q.type||'mcq')==='numeric'){
+     const isFormula=/^(relation|conversion|formule|modèle|loi|cas)\s*:/i.test(String(line).trim());
      const vals=nums(line),ans=Number(q.answer_num),tol=Math.max(Number(q.tolerance||0),Math.abs(ans)*1e-6);
-     if(vals.length===1&&Math.abs(vals[0]-ans)<=tol&&!qText.includes(String(vals[0])))return false;
+     if(!isFormula&&vals.length===1&&Math.abs(vals[0]-ans)<=tol&&!qText.includes(String(vals[0])))return false;
    }
    if((q.type||'mcq')==='mcq'&&Array.isArray(q.choices)&&Number.isInteger(q.answer)){
      const good=norm(q.choices[q.answer]);
