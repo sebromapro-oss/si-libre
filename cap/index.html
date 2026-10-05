@@ -671,7 +671,29 @@ function isQuestionCorrect(q,payload){
 function renderGivens(q){
  const gs=q.givens||[];
  if(!gs.length)return '';
- return `<div class="givens-box"><strong>Données utiles</strong><ul>${gs.map(x=>`<li>${formatSI(x)}</li>`).join('')}</ul></div>`;
+ const norm=s=>String(s??'').toLowerCase().replace(/[,]/g,'.').replace(/\s+/g,' ').trim();
+ const nums=s=>[...String(s??'').replace(/\s(?=\d{3}\b)/g,'').matchAll(/[-+]?\d+(?:[.,]\d+)?/g)].map(m=>Number(m[0].replace(',','.'))).filter(Number.isFinite);
+ const qText=norm(q.q);
+ const filtered=gs.filter(line=>{
+   const txt=norm(line);
+   if(!txt)return false;
+   if(/^(objectif|objectif spécifique|système étudié|système)\s*:/.test(txt))return false;
+   if((q.type||'mcq')==='numeric'){
+     const vals=nums(line),ans=Number(q.answer_num),tol=Math.max(Number(q.tolerance||0),Math.abs(ans)*1e-6);
+     if(vals.length===1&&Math.abs(vals[0]-ans)<=tol&&!qText.includes(String(vals[0])))return false;
+   }
+   if((q.type||'mcq')==='mcq'&&Array.isArray(q.choices)&&Number.isInteger(q.answer)){
+     const good=norm(q.choices[q.answer]);
+     if(good.length>2&&txt.includes(good)&&!qText.includes(good))return false;
+   }
+   if(q.type==='multi'&&Array.isArray(q.choices)&&Array.isArray(q.answers)){
+     const goods=q.answers.map(i=>norm(q.choices[i])).filter(x=>x.length>2);
+     if(goods.length&&goods.every(g=>txt.includes(g))&&!goods.some(g=>qText.includes(g)))return false;
+   }
+   return true;
+ });
+ if(!filtered.length)return '';
+ return `<div class="givens-box"><strong>Données utiles</strong><ul>${filtered.map(x=>`<li>${formatSI(x)}</li>`).join('')}</ul></div>`;
 }
 function renderQuestionInput(q){
  const type=q.type||'mcq';
