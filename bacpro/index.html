@@ -824,8 +824,10 @@ function openMission(id){
    if(pass&&!state.done.includes(m.id)){state.done.push(m.id);state.xp+=m.xp;gain=m.xp}
    if(ratio===1)state.perfect=(state.perfect||0)+1;
    state.scores[m.id]=Math.max(state.scores[m.id]||0,Math.round(ratio*100));updateStreak(pass);save();
-   view.innerHTML=`<div class="result"><div class="emoji">${pass?'🏁':'🔁'}</div><span class="eyebrow">${pass?'NOTION RÉUSSIE':'À REJOUER'}</span><h3 id="missionTitle">${correct}/${m.questions.length}</h3><p>${pass?`Notion travaillée : ${m.knowledge}. ${missionSupport(m.id)}. Domaine : ${domainStatus(m.domain)}.${gain?' +'+gain+' XP.':''}`:'Relis le feedback et utilise les aides graduées si nécessaire.'}</p><button class="primary" id="retry">Rejouer</button></div>`;
-   document.querySelector('#retry').onclick=()=>openMission(m.id);document.querySelector('#retry').focus();
+   view.innerHTML=`<div class="result"><div class="emoji">${pass?'🏁':'🔁'}</div><span class="eyebrow">${pass?'NOTION RÉUSSIE':'À REJOUER'}</span><h3 id="missionTitle">${correct}/${m.questions.length}</h3><p>${pass?`Notion travaillée : ${m.knowledge}. ${missionSupport(m.id)}. Domaine : ${domainStatus(m.domain)}.${gain?' +'+gain+' XP.':''}`:'Relis le feedback et utilise les aides graduées si nécessaire.'}</p><div class="actions"><button class="primary" id="retry">Rejouer</button><button class="secondary" id="backToPath">Retour au parcours</button></div></div>`;
+   document.querySelector('#retry').onclick=()=>openMission(m.id);
+   document.querySelector('#backToPath').onclick=()=>{closeMainModal();render();const target=document.querySelector('#parcours');if(target)target.scrollIntoView({behavior:'smooth'})};
+   document.querySelector('#retry').focus();
  };
  draw();
 }
