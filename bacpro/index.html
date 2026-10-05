@@ -89,6 +89,16 @@ sub{font-size:.72em;vertical-align:-.28em;line-height:0}
 .micro-course p{margin:5px 0 11px;line-height:1.55;color:#dbe7f5}.micro-course p:last-child{margin-bottom:0}
 .micro-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
 .micro-title.warning{color:var(--yellow)}.feedback strong{display:block;margin-bottom:7px}
+
+/* SI Libre — schémas pédagogiques */
+.si-diagram{margin:14px 0 18px;padding:12px;border:1px solid rgba(102,220,255,.18);border-radius:16px;background:rgba(6,16,29,.55)}
+.si-diagram .diag-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin:0 0 8px}
+.si-diagram svg{display:block;width:100%;height:auto;max-height:260px}
+.si-diagram text{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;fill:#e9f3ff;font-size:13px}
+.si-diagram .line{stroke:#8fb8d9;stroke-width:2;fill:none}.si-diagram .strong{stroke:#66dcff;stroke-width:3;fill:none}.si-diagram .accent{stroke:#ffd166;stroke-width:3;fill:none}
+.si-diagram .block{fill:#10233a;stroke:#52779c;stroke-width:1.5;rx:10}.si-diagram .ghost{fill:#0a1727;stroke:#334d69;stroke-width:1.2;stroke-dasharray:5 4}
+.si-diagram .point{fill:#66dcff}.si-diagram .force{stroke:#ffd166;stroke-width:3}.si-diagram .flow{stroke:#66dcff;stroke-width:3}.si-diagram .note{font-size:12px;fill:#d9e7f4}
+
 </style>
 </head>
 <body>
@@ -8626,6 +8636,41 @@ function renderAudit(){
 }
 
 
+
+function diagramNeeded(m,q){
+ const t=(q.q+' '+(q.explain||'')+' '+(m.knowledge||'')).toLowerCase(),d=m.domain;
+ if(['meca','auto','elec','signal','reseaux','modelisation'].includes(d))return true;
+ const p={energie:/chaîne|flux|rendement|puissance|hydraul|conversion|stockage|énergie/,mesure:/capteur|chaîne|mesure|résolution|justesse|incertitude|plage|acquisition/,systeme:/architecture|fonction|flux|chaîne|entrée|sortie|exigence/,info:/boucle|condition|état|transition|algorithme|entrée|sortie|sécurité/,communication:/graphique|schéma|évolution|donnée|architecture/,innovation:/matrice|prototype|critère|concept|divergence|convergence/};
+ return p[d]?p[d].test(t):false;
+}
+function svgWrap(title,body){return '<div class="si-diagram" role="img" aria-label="'+title+'"><div class="diag-title">'+title+'</div><svg viewBox="0 0 720 240" aria-hidden="true"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#66dcff"/></marker><marker id="arrY" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#ffd166"/></marker></defs>'+body+'</svg></div>'}
+function diagramFor(m,q){
+ if(!diagramNeeded(m,q))return '';
+ const t=(q.q+' '+(q.explain||'')).toLowerCase(),d=m.domain;
+ if(d==='meca'){
+  if(/moment|bras|levier/.test(t))return svgWrap('Schéma — moment d’une force','<line x1="110" y1="175" x2="620" y2="175" class="line"/><circle cx="190" cy="175" r="7" class="point"/><text x="175" y="205">A</text><line x1="500" y1="72" x2="500" y2="168" class="force" marker-end="url(#arrY)"/><text x="512" y="95">F</text><line x1="190" y1="145" x2="500" y2="145" class="strong" marker-end="url(#arr)"/><text x="330" y="132">bras de levier d</text><text x="90" y="42" class="note">M_A = F × d si F ⟂ d</text>');
+  if(/pfd|accélération|dynamique/.test(t))return svgWrap('Schéma — bilan dynamique','<rect x="285" y="90" width="150" height="80" class="block"/><text x="335" y="135">Système</text><line x1="145" y1="130" x2="275" y2="130" class="force" marker-end="url(#arrY)"/><text x="145" y="112">F₁</text><line x1="575" y1="130" x2="445" y2="130" class="force" marker-end="url(#arrY)"/><text x="548" y="112">F₂</text><line x1="360" y1="82" x2="500" y2="45" class="strong" marker-end="url(#arr)"/><text x="510" y="48">a_G</text><text x="250" y="218" class="note">∑ F_ext = m · a_G</text>');
+  return svgWrap('Schéma — solide isolé et actions mécaniques','<rect x="285" y="82" width="150" height="95" class="block"/><text x="324" y="133">Solide S</text><line x1="360" y1="80" x2="360" y2="30" class="force" marker-end="url(#arrY)"/><text x="375" y="42">R</text><line x1="360" y1="180" x2="360" y2="225" class="force" marker-end="url(#arrY)"/><text x="375" y="220">P</text><line x1="435" y1="130" x2="560" y2="130" class="force" marker-end="url(#arrY)"/><text x="520" y="112">F</text>');
+ }
+ if(d==='elec'){
+  if(/nœud/.test(t))return svgWrap('Schéma — loi des nœuds','<circle cx="360" cy="120" r="9" class="point"/><line x1="110" y1="120" x2="345" y2="120" class="flow" marker-end="url(#arr)"/><text x="185" y="103">I₁</text><line x1="360" y1="35" x2="360" y2="105" class="flow" marker-end="url(#arr)"/><text x="375" y="63">I₂</text><line x1="375" y1="120" x2="610" y2="120" class="flow" marker-end="url(#arr)"/><text x="520" y="103">I₃</text><text x="275" y="205" class="note">∑ I_k = 0</text>');
+  return svgWrap('Schéma — tension, courant, résistance','<line x1="100" y1="120" x2="280" y2="120" class="strong" marker-end="url(#arr)"/><text x="175" y="100">I</text><rect x="280" y="85" width="160" height="70" class="block"/><text x="340" y="126">R</text><line x1="440" y1="120" x2="620" y2="120" class="line"/><line x1="290" y1="185" x2="430" y2="185" class="accent" marker-end="url(#arrY)"/><text x="352" y="212">U</text><text x="292" y="52" class="note">U = R · I</text>');
+ }
+ if(d==='auto')return svgWrap('Schéma — boucle d’asservissement','<rect x="55" y="92" width="105" height="55" class="block"/><text x="79" y="124">Consigne</text><circle cx="210" cy="120" r="24" class="ghost"/><text x="201" y="125">Σ</text><rect x="270" y="92" width="115" height="55" class="block"/><text x="290" y="124">Correcteur</text><rect x="445" y="92" width="115" height="55" class="block"/><text x="474" y="124">Procédé</text><line x1="160" y1="120" x2="185" y2="120" class="flow" marker-end="url(#arr)"/><line x1="235" y1="120" x2="270" y2="120" class="flow" marker-end="url(#arr)"/><line x1="385" y1="120" x2="445" y2="120" class="flow" marker-end="url(#arr)"/><rect x="445" y="178" width="115" height="42" class="block"/><text x="478" y="204">Capteur</text><path d="M620 120 L620 199 L560 199" class="line" marker-end="url(#arr)"/><path d="M445 199 L210 199 L210 145" class="line" marker-end="url(#arr)"/>');
+ if(d==='energie')return /hydraul|pression|surface|débit/.test(t)?svgWrap('Schéma — actionneur hydraulique','<rect x="180" y="70" width="340" height="110" class="ghost"/><rect x="335" y="72" width="18" height="106" class="block"/><line x1="353" y1="125" x2="610" y2="125" class="strong"/><text x="230" y="112">p₁, S₁</text><text x="405" y="112">p₂, S₂</text><line x1="105" y1="125" x2="175" y2="125" class="flow" marker-end="url(#arr)"/><text x="95" y="106">Qᵥ</text><line x1="610" y1="125" x2="665" y2="125" class="force" marker-end="url(#arrY)"/><text x="635" y="106">F</text><text x="265" y="220" class="note">F ≈ p · S</text>'):svgWrap('Schéma — chaîne d’énergie','<rect x="45" y="85" width="110" height="60" class="block"/><text x="68" y="120">Alimenter</text><rect x="200" y="85" width="110" height="60" class="block"/><text x="222" y="120">Distribuer</text><rect x="355" y="85" width="110" height="60" class="block"/><text x="374" y="120">Convertir</text><rect x="510" y="85" width="110" height="60" class="block"/><text x="526" y="120">Transmettre</text><line x1="155" y1="115" x2="200" y2="115" class="flow" marker-end="url(#arr)"/><line x1="310" y1="115" x2="355" y2="115" class="flow" marker-end="url(#arr)"/><line x1="465" y1="115" x2="510" y2="115" class="flow" marker-end="url(#arr)"/>');
+ const generic={
+  signal:['Schéma — signal et échantillonnage','<line x1="70" y1="190" x2="650" y2="190" class="line"/><line x1="90" y1="210" x2="90" y2="35" class="line"/><path d="M90 120 C140 40 190 40 240 120 S340 200 390 120 S490 40 540 120 S620 200 650 135" class="strong"/><text x="475" y="45" class="note">Échantillonnage régulier</text>'],
+  reseaux:['Schéma — architecture réseau','<rect x="285" y="90" width="150" height="60" class="block"/><text x="330" y="125">Switch</text><rect x="70" y="45" width="130" height="50" class="block"/><text x="103" y="75">Capteur</text><rect x="70" y="165" width="130" height="50" class="block"/><text x="104" y="195">IHM</text><rect x="520" y="45" width="130" height="50" class="block"/><text x="550" y="75">Automate</text><rect x="520" y="165" width="130" height="50" class="block"/><text x="548" y="195">Variateur</text><line x1="200" y1="70" x2="285" y2="110" class="line"/><line x1="200" y1="190" x2="285" y2="130" class="line"/><line x1="435" y1="110" x2="520" y2="70" class="line"/><line x1="435" y1="130" x2="520" y2="190" class="line"/>'],
+  mesure:['Schéma — chaîne de mesure','<rect x="55" y="88" width="120" height="58" class="block"/><text x="82" y="121">Grandeur</text><rect x="220" y="88" width="120" height="58" class="block"/><text x="250" y="121">Capteur</text><rect x="385" y="88" width="120" height="58" class="block"/><text x="404" y="121">Acquisition</text><rect x="550" y="88" width="120" height="58" class="block"/><text x="578" y="121">Valeur</text><line x1="175" y1="117" x2="220" y2="117" class="flow" marker-end="url(#arr)"/><line x1="340" y1="117" x2="385" y2="117" class="flow" marker-end="url(#arr)"/><line x1="505" y1="117" x2="550" y2="117" class="flow" marker-end="url(#arr)"/>'],
+  systeme:['Schéma — besoin, fonctions et solution','<rect x="55" y="85" width="130" height="62" class="block"/><text x="98" y="122">Besoin</text><rect x="275" y="85" width="160" height="62" class="block"/><text x="311" y="112">Fonctions /</text><text x="306" y="132">exigences</text><rect x="525" y="85" width="140" height="62" class="block"/><text x="557" y="122">Solution</text><line x1="185" y1="116" x2="275" y2="116" class="flow" marker-end="url(#arr)"/><line x1="435" y1="116" x2="525" y2="116" class="flow" marker-end="url(#arr)"/>'],
+  info:['Schéma — logique séquentielle','<rect x="70" y="90" width="120" height="55" class="block"/><text x="100" y="123">État A</text><rect x="300" y="90" width="120" height="55" class="block"/><text x="330" y="123">État B</text><rect x="530" y="90" width="120" height="55" class="block"/><text x="560" y="123">État C</text><line x1="190" y1="117" x2="300" y2="117" class="flow" marker-end="url(#arr)"/><text x="217" y="98">condition 1</text><line x1="420" y1="117" x2="530" y2="117" class="flow" marker-end="url(#arr)"/><text x="447" y="98">condition 2</text>'],
+  modelisation:['Schéma — réel ↔ modèle ↔ validation','<rect x="55" y="85" width="145" height="65" class="block"/><text x="100" y="123">Réel</text><rect x="290" y="85" width="145" height="65" class="block"/><text x="326" y="113">Modèle /</text><text x="318" y="133">simulation</text><rect x="525" y="85" width="145" height="65" class="block"/><text x="550" y="123">Comparaison</text><line x1="200" y1="117" x2="290" y2="117" class="flow" marker-end="url(#arr)"/><line x1="435" y1="117" x2="525" y2="117" class="flow" marker-end="url(#arr)"/>'],
+  communication:['Schéma — donnée → interprétation → décision','<rect x="70" y="85" width="150" height="62" class="block"/><text x="118" y="122">Données</text><rect x="285" y="85" width="150" height="62" class="block"/><text x="317" y="122">Interprétation</text><rect x="500" y="85" width="150" height="62" class="block"/><text x="546" y="122">Décision</text><line x1="220" y1="116" x2="285" y2="116" class="flow" marker-end="url(#arr)"/><line x1="435" y1="116" x2="500" y2="116" class="flow" marker-end="url(#arr)"/>'],
+  innovation:['Schéma — divergence puis convergence','<circle cx="130" cy="120" r="9" class="point"/><text x="88" y="155">Besoin</text><line x1="140" y1="120" x2="275" y2="55" class="line" marker-end="url(#arr)"/><line x1="140" y1="120" x2="275" y2="120" class="line" marker-end="url(#arr)"/><line x1="140" y1="120" x2="275" y2="185" class="line" marker-end="url(#arr)"/><circle cx="300" cy="55" r="18" class="ghost"/><circle cx="300" cy="120" r="18" class="ghost"/><circle cx="300" cy="185" r="18" class="ghost"/><line x1="320" y1="55" x2="525" y2="120" class="accent" marker-end="url(#arrY)"/><line x1="320" y1="120" x2="525" y2="120" class="accent" marker-end="url(#arrY)"/><line x1="320" y1="185" x2="525" y2="120" class="accent" marker-end="url(#arrY)"/><circle cx="550" cy="120" r="24" class="point"/>']
+ };
+ return generic[d]?svgWrap(generic[d][0],generic[d][1]):'';
+}
+
 function shuffledQuestion(q){
  const items=q.choices.map((text,originalIndex)=>({text,correct:originalIndex===q.answer}));
  for(let i=items.length-1;i>0;i--){
@@ -8665,7 +8710,7 @@ function openMission(id){
     ${m.source_ids?.length?`<div class="mission-sources">${m.source_ids.map(id=>sources[id]?`<a href="${sources[id].url}" target="_blank" rel="noopener">${sources[id].label} ↗</a>`:'').join('')}</div>`:''}
    </div>
    <div class="meta"><span>Question ${qi+1}/${m.questions.length}</span><span>N${m.tier} • ${formatSI(m.knowledge)}</span></div>
-   <div class="qbox"><h3>${formatSI(q.q)}</h3><div class="choices">${currentDisplay.items.map((c,i)=>`<button class="choice" data-c="${i}">${formatSI(c.text)}</button>`).join('')}</div>
+   <div class="qbox">${diagramFor(m,q)}<h3>${formatSI(q.q)}</h3><div class="choices">${currentDisplay.items.map((c,i)=>`<button class="choice" data-c="${i}">${formatSI(c.text)}</button>`).join('')}</div>
    <div id="fb" class="feedback" aria-live="polite"></div>
    <div class="help-zone"><button id="aidBtn" class="secondary">Je suis bloqué</button><div id="aidBox" aria-live="polite"></div></div></div>`;
    document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>answer(Number(b.dataset.c),q));
@@ -8679,7 +8724,7 @@ function openMission(id){
    bs[correctIndex].classList.add('ok');
    bs.forEach(b=>b.disabled=true);
    const lesson=m.course||{};
-   const courseBlock=`<div class="micro-course">
+   const courseBlock=`${diagramFor(m,q)}<div class="micro-course">
     <div class="micro-title">À retenir</div><p>${formatSI(lesson.retain||q.explain)}</p>
     <div class="micro-title">Méthode</div><p>${formatSI(lesson.method||'Identifier les données, choisir le modèle, calculer puis vérifier.')}</p>
     <div class="micro-title warning">Erreur fréquente</div><p>${formatSI(lesson.trap||'Ne pas oublier de contrôler les unités et la cohérence du résultat.')}</p>
