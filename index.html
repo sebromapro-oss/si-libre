@@ -1,25 +1,121 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="SI Libre — entraînement libre en Sciences Industrielles pour CAP, Bac Pro et BTS.">
-<title>SI Libre</title>
-<style>
-:root{--bg:#07101d;--card:#0f1b2d;--line:#223653;--txt:#f6f9ff;--muted:#9bacc3;--cyan:#66dcff}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 15% -10%,#12345c 0,transparent 32%),var(--bg);color:var(--txt);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-main{width:min(980px,92%);padding:42px 0}h1{font-size:clamp(42px,8vw,76px);margin:0 0 8px}p{color:var(--muted);font-size:18px;line-height:1.55}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px}
-.card{display:block;padding:28px;border:1px solid var(--line);border-radius:22px;background:rgba(15,27,45,.92);color:inherit;text-decoration:none;transition:.18s transform,.18s border-color}.card:hover,.card:focus-visible{transform:translateY(-3px);border-color:var(--cyan);outline:none}.card strong{display:block;font-size:28px;margin-bottom:7px}.card span{color:var(--muted);line-height:1.45}.foot{margin-top:28px;font-size:13px}
-@media(max-width:720px){.grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f4c81">
+  <meta name="description" content="Réactivation mémoire en Sciences Industrielles — BTS TSMA, BTS MMCM, Bac Pro et CAP Maintenance.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>SI Réactivation</title>
 </head>
-<body><main>
-<h1>SI Libre</h1>
-<p>Choisis ton niveau. Entraînement progressif, micro-cours après chaque réponse et réactivation des notions.</p>
-<div class="grid">
-<a class="card" href="./cap/"><strong>CAP</strong><span>Fondamentaux • Comprendre • Appliquer</span></a>
-<a class="card" href="./bacpro/"><strong>Bac Pro</strong><span>Appliquer • Analyser • Valider</span></a>
-<a class="card" href="./bts/"><strong>BTS</strong><span>Analyser • Modéliser • Résoudre • Valider</span></a>
-</div>
-<p class="foot">Aucune donnée personnelle requise pour utiliser les entraînements.</p>
-</main></body></html>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">Σℝ</div>
+    <div>
+      <strong>SI Réactivation</strong>
+      <span>Mémoriser • comprendre • transférer</span>
+    </div>
+  </div>
+  <button id="logoutBtn" class="btn ghost hidden" type="button">Déconnexion</button>
+</header>
+
+<main id="main" class="shell">
+  <section id="loginView" class="panel auth-panel">
+    <p class="eyebrow">ACCÈS RÉSERVÉ AUX ÉLÈVES</p>
+    <h1>Réactive l’essentiel, quelques minutes à la fois.</h1>
+    <p class="lead">Les questions reviennent au bon moment selon tes réussites et tes difficultés.</p>
+    <form id="loginForm" class="form">
+      <label>Adresse e-mail
+        <input id="email" type="email" autocomplete="username" required>
+      </label>
+      <label>Mot de passe
+        <input id="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn primary" type="submit">Se connecter</button>
+    </form>
+    <p id="loginMsg" class="msg" role="status" aria-live="polite"></p>
+    <p class="micro">Les comptes sont créés par l’enseignant. Aucun accès public au contenu pédagogique.</p>
+  </section>
+
+  <section id="studentView" class="hidden">
+    <div class="hero panel">
+      <div>
+        <p id="trackBadge" class="eyebrow"></p>
+        <h1 id="welcomeTitle">Bonjour</h1>
+        <p class="lead">Objectif du jour : <strong>4 réactivations</strong>, sans surcharge.</p>
+      </div>
+      <div class="progress-card">
+        <span>Progression du jour</span>
+        <strong id="dailyProgress">0 / 4</strong>
+        <div class="progress"><span id="dailyBar"></span></div>
+      </div>
+    </div>
+
+    <div id="questionCard" class="panel question-card">
+      <div class="question-meta">
+        <span id="sequenceTag" class="tag"></span>
+        <span id="themeTag" class="tag soft"></span>
+        <span id="difficultyTag" class="tag soft"></span>
+      </div>
+      <p id="notionLabel" class="eyebrow"></p>
+      <h2 id="questionText"></h2>
+      <button id="revealBtn" class="btn primary" type="button">Afficher la réponse</button>
+      <div id="answerBlock" class="answer hidden" aria-live="polite">
+        <p class="answer-label">Réponse attendue</p>
+        <p id="answerText"></p>
+        <div class="rating">
+          <button data-result="correct" class="btn success" type="button">Je savais</button>
+          <button data-result="fragile" class="btn warn" type="button">J’ai hésité</button>
+          <button data-result="wrong" class="btn danger" type="button">À revoir</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sessionDone" class="panel hidden center">
+      <p class="eyebrow">SESSION TERMINÉE</p>
+      <h2>Réactivation du jour terminée.</h2>
+      <p id="sessionSummary" class="lead"></p>
+      <button id="extraBtn" class="btn ghost" type="button">Faire 2 questions en plus</button>
+    </div>
+
+    <section class="panel dashboard">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">MÉMOIRE</p>
+          <h2>Mon état d’apprentissage</h2>
+        </div>
+      </div>
+      <div id="memoryStats" class="stats"></div>
+    </section>
+  </section>
+
+  <section id="teacherView" class="hidden">
+    <div class="hero panel">
+      <div>
+        <p class="eyebrow">ESPACE ENSEIGNANT</p>
+        <h1>Tableau de bord Réactivation</h1>
+        <p class="lead">Vue globale des parcours et des comptes autorisés.</p>
+      </div>
+    </div>
+    <div id="teacherStats" class="stats"></div>
+    <section class="panel">
+      <h2>Comptes élèves</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Élève</th><th>Parcours</th><th>Actif</th></tr></thead>
+          <tbody id="studentsBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js" defer></script>
+</body>
+</html>
