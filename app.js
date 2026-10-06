@@ -7,7 +7,7 @@ const loginView=$('#loginView'),studentView=$('#studentView'),teacherView=$('#te
 let session=null,profile=null,questions=[],states=[],queue=[],current=null,done=0,sessionResults={correct:0,fragile:0,wrong:0};
 
 const stageOrder=['J0','J+2','J+7','J+21','J+45','J+90'];
-const stageDays={'J0':2,'J+2':7,'J+7':21,'J+21':45,'J+45':90,'J+90':90};
+const stageDays={'J0':0,'J+2':2,'J+7':7,'J+21':21,'J+45':45,'J+90':90};
 const labels={TSMA:'BTS TSMA',MMCM:'BTS MMCM',BAC_PRO:'Bac Pro Maintenance',CAP:'CAP Maintenance'};
 
 function show(el){el.classList.remove('hidden')} function hide(el){el.classList.add('hidden')}
@@ -117,16 +117,35 @@ function renderMemoryStats(){
 }
 
 async function loadTeacher(){
-  const [profilesR,questionsR,attemptsR]=await Promise.all([
+  const [profilesR,questionsR,attemptsR,stateR]=await Promise.all([
     db.from('reactivation_profiles').select('user_id,display_name,track,role,active').order('display_name'),
-    db.from('reactivation_questions').select('track,id').eq('active',true),
-    db.from('reactivation_attempts').select('id',{count:'exact',head:true})
+    db.from('reactivation_questions').select('track,id,status').eq('active',true),
+    db.from('reactivation_attempts').select('user_id,result,attempted_at'),
+    db.from('reactivation_state').select('user_id,stage,last_result,last_seen_at')
   ]);
-  const ps=profilesR.data||[], qs=questionsR.data||[];
-  const cards=['TSMA','MMCM','BAC_PRO','CAP'].map(t=>[labels[t],qs.filter(q=>q.track===t).length]);
-  cards.push(['Comptes élèves',ps.filter(p=>p.role==='student').length],['Tentatives',attemptsR.count||0]);
+  const ps=profilesR.data||[], qs=questionsR.data||[], ats=attemptsR.data||[], st=stateR.data||[];
+  const cards=['TSMA','MMCM','BAC_PRO','CAP'].map(t=>[labels[t],qs.filter(q=>q.track===t&&q.status!=='DOUBLON_NOTION').length]);
+  cards.push(['Comptes élèves',ps.filter(p=>p.role==='student').length],['Tentatives',ats.length]);
   $('#teacherStats').innerHTML=cards.map(([l,v])=>`<div class="stat"><span>${esc(l)}</span><strong>${v}</strong></div>`).join('');
-  $('#studentsBody').innerHTML=ps.filter(p=>p.role==='student').map(p=>`<tr><td>${esc(p.display_name||'—')}</td><td>${esc(labels[p.track]||p.track||'—')}</td><td>${p.active?'Oui':'Non'}</td></tr>`).join('');
+  $('#studentsBody').innerHTML=ps.filter(p=>p.role==='student').map(p=>{
+    const ss=st.filter(x=>x.user_id===p.user_id);
+    const aa=ats.filter(x=>x.user_id===p.user_id);
+    const mastered=ss.filter(x=>['J+21','J+45','J+90'].includes(x.stage)).length;
+    const stable=ss.filter(x=>x.stage==='J+90').length;
+    const fragile=ss.filter(x=>x.last_result==='wrong'||x.last_result==='fragile').length;
+    const last=[...ss.map(x=>x.last_seen_at),...aa.map(x=>x.attempted_at)].filter(Boolean).sort().at(-1);
+    return `<tr>
+      <td>${esc(p.display_name||'—')}</td>
+      <td>${esc(labels[p.track]||p.track||'—')}</td>
+      <td>${ss.length}</td>
+      <td>${fragile}</td>
+      <td>${mastered}</td>
+      <td>${stable}</td>
+      <td>${aa.length}</td>
+      <td>${last?new Date(last).toLocaleDateString('fr-FR'):'—'}</td>
+      <td>${p.active?'Oui':'Non'}</td>
+    </tr>`;
+  }).join('');
 }
 if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 init();
