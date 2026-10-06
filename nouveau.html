@@ -4,175 +4,65 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0f4c81">
-  <meta name="description" content="Réactivation mémoire en Sciences Industrielles — séances de classe et révision autonome.">
-  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="description" content="Réactivation mémoire en Sciences Industrielles">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?rev=202610061140">
-  <title>SI Réactivation — Nouveau départ</title>
+  <link rel="stylesheet" href="styles.css?rev=7">
+  <title>SI Réactivation</title>
 </head>
 <body>
-<a class="skip-link" href="#main">Aller au contenu</a>
-
 <header class="topbar">
   <div class="brand">
     <div class="logo" aria-hidden="true">Σℝ</div>
     <div>
       <strong>SI Réactivation</strong>
-      <span>5 min réfléchir • 10 min corriger • revoir quand il faut</span>
+      <span>5 min réfléchir • 10 min corriger</span>
     </div>
   </div>
   <button id="logoutBtn" class="btn ghost hidden" type="button">Déconnexion</button>
 </header>
 
-<main id="main" class="shell">
-  <section id="loginView" class="panel auth-panel">
+<main class="shell">
+  <section id="authView" class="panel auth-panel">
     <p class="eyebrow">ACCÈS ENSEIGNANT</p>
     <h1>SI Réactivation</h1>
-    <p class="lead">Choisis ce que tu veux faire.</p>
+    <p class="lead">Crée ton accès professeur ou connecte-toi.</p>
 
-    <div class="mode-tabs" role="tablist" aria-label="Accès professeur">
+    <div class="mode-tabs">
       <button id="showCreateBtn" class="mode-btn active" type="button">Créer mon accès professeur</button>
       <button id="showLoginBtn" class="mode-btn" type="button">J’ai déjà un accès</button>
     </div>
 
-    <form id="loginForm" class="form">
+    <form id="authForm" class="form">
       <label>Identifiant
-        <input id="email" type="text" autocomplete="username" placeholder="Choisis ton identifiant" required>
+        <input id="loginId" type="text" autocomplete="username" required>
       </label>
       <label>Mot de passe
-        <input id="password" type="password" autocomplete="new-password" required>
+        <input id="loginPassword" type="password" autocomplete="new-password" required>
       </label>
       <label id="confirmWrap">Confirmer le mot de passe
-        <input id="passwordConfirm" type="password" autocomplete="new-password" required>
+        <input id="loginPasswordConfirm" type="password" autocomplete="new-password" required>
       </label>
       <button id="loginSubmitBtn" class="btn primary" type="submit">Créer mon accès professeur</button>
     </form>
 
-    <p id="loginMsg" class="msg" role="status" aria-live="polite"></p>
-    <p id="loginHelp" class="micro">Premier accès : crée toi-même ton identifiant et ton mot de passe. Les élèves n’ont aucun compte à créer ici.</p>
-  </section>
-
-  <section id="publicArchiveView" class="hidden">
-    <div class="hero panel">
-      <div>
-        <p id="archiveTrackBadge" class="eyebrow"></p>
-        <h1>Réactivations mémoire</h1>
-        <p class="lead">Revois une séance si tu étais absent, en entreprise, ou pour reprendre la correction en autonomie.</p>
-      </div>
-    </div>
-    <section class="panel">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">SÉANCES CLÔTURÉES</p>
-          <h2>Choisir une réactivation</h2>
-        </div>
-      </div>
-      <div id="publicArchiveList" class="history-list"></div>
-    </section>
-    <section id="publicArchiveDetail" class="hidden">
-      <div class="panel">
-        <button id="archiveBackBtn" class="btn ghost" type="button">← Retour aux séances</button>
-        <p id="archiveSessionMeta" class="eyebrow"></p>
-        <h2 id="archiveSessionTitle"></h2>
-      </div>
-      <div id="publicArchiveQuestions" class="question-grid"></div>
-    </section>
-  </section>
-
-  <section id="studentView" class="hidden">
-    <div class="hero panel">
-      <div>
-        <p id="trackBadge" class="eyebrow"></p>
-        <h1 id="welcomeTitle">Bonjour</h1>
-        <p class="lead">En classe : la même réactivation pour tous. En entreprise ou en cas d’absence : retrouve la séance et corrige-la en autonomie.</p>
-      </div>
-      <div class="progress-card">
-        <span>Mémoire personnelle</span>
-        <strong id="masteredCount">0 maîtrisée</strong>
-        <span id="fragileCount" class="micro">0 à revoir</span>
-      </div>
-    </div>
-
-    <nav class="mode-tabs" aria-label="Modes élève">
-      <button class="mode-btn active" data-view="classSession" type="button">Séance de classe</button>
-      <button class="mode-btn" data-view="freeReview" type="button">Révision libre</button>
-      <button class="mode-btn" data-view="historyView" type="button">Mes anciennes séances</button>
-      <button class="mode-btn" data-view="progressView" type="button">Mes progrès</button>
-    </nav>
-
-    <section id="classSession" class="student-pane">
-      <div id="noClassSession" class="panel center hidden">
-        <p class="eyebrow">AUCUNE SÉANCE ACTIVE</p>
-        <h2>Pas de réactivation de classe en cours.</h2>
-        <p class="lead">Tu peux utiliser la révision libre ou reprendre une ancienne séance.</p>
-      </div>
-
-      <div id="classSessionPanel" class="hidden">
-        <div class="panel session-head">
-          <div>
-            <p id="classPhase" class="eyebrow"></p>
-            <h2 id="classTitle"></h2>
-            <p id="classDate" class="micro"></p>
-          </div>
-          <div class="timer-card">
-            <span id="timerLabel">Temps conseillé</span>
-            <strong id="phaseTimer">05:00</strong>
-          </div>
-        </div>
-        <div id="classQuestions" class="question-grid"></div>
-        <div id="classCorrectionHint" class="panel notice hidden">
-          <strong>Correction active</strong>
-          <p>Compare ton raisonnement à la réponse, puis indique si tu savais, si tu as hésité ou si la notion est à revoir.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="freeReview" class="student-pane hidden">
-      <div class="panel">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">AUTONOMIE</p>
-            <h2>Révision libre</h2>
-            <p class="micro">Cette activité consolide ta mémoire sans remplacer la séance commune.</p>
-          </div>
-          <button id="newFreeReviewBtn" class="btn ghost" type="button">Nouvelle série</button>
-        </div>
-      </div>
-      <div id="freeQuestionCard" class="panel question-card"></div>
-    </section>
-
-    <section id="historyView" class="student-pane hidden">
-      <div class="panel">
-        <p class="eyebrow">ARCHIVES</p>
-        <h2>Mes anciennes séances de classe</h2>
-        <p class="lead">Retrouve une séance si tu étais absent, en entreprise, ou si tu veux refaire la correction.</p>
-        <div id="sessionHistory" class="history-list"></div>
-      </div>
-    </section>
-
-    <section id="progressView" class="student-pane hidden">
-      <section class="panel dashboard">
-        <p class="eyebrow">MÉMOIRE</p>
-        <h2>Mon état d’apprentissage</h2>
-        <div id="memoryStats" class="stats"></div>
-      </section>
-    </section>
+    <p id="loginMsg" class="msg" role="status"></p>
+    <p id="loginHelp" class="micro">Premier accès : choisis ton identifiant et ton mot de passe.</p>
   </section>
 
   <section id="teacherView" class="hidden">
-    <div class="hero panel">
+    <section class="hero panel">
       <div>
         <p class="eyebrow">ESPACE ENSEIGNANT</p>
         <h1>Piloter une réactivation de classe</h1>
-        <p class="lead">4 questions communes • 5 min de réflexion • 10 min de correction active.</p>
+        <p class="lead">4 questions • 5 min de réflexion • 10 min de correction active.</p>
       </div>
-    </div>
+    </section>
 
-    <section class="panel teacher-launch">
-      <div>
-        <p class="eyebrow">NOUVELLE SÉANCE</p>
-        <h2>Créer la série du jour</h2>
-      </div>
+    <div id="teacherStats" class="stats"></div>
+
+    <section class="panel">
+      <p class="eyebrow">NOUVELLE SÉANCE</p>
+      <h2>Créer rapidement une série</h2>
       <div class="launch-grid">
         <label>Parcours
           <select id="sessionTrack">
@@ -185,42 +75,119 @@
         <label>Titre
           <input id="sessionTitle" type="text" value="Réactivation du jour">
         </label>
-        <button id="createSessionBtn" class="btn primary" type="button">Créer 4 questions</button>
+        <button id="createRandom" class="btn primary" type="button">Créer 4 questions automatiquement</button>
       </div>
-      <p id="teacherMsg" class="msg" role="status"></p>
+      <p id="sessionMsg" class="msg" role="status"></p>
     </section>
 
-    <section id="teacherSessionPanel" class="panel hidden">
+    <section id="sessionPanel" class="panel hidden">
       <div class="section-head">
         <div>
-          <p class="eyebrow">SÉANCE PRÉPARÉE</p>
-          <h2 id="teacherSessionTitle"></h2>
-          <p id="teacherSessionMeta" class="micro"></p>
+          <p id="sessionPhase" class="eyebrow"></p>
+          <h2 id="sessionName"></h2>
+          <p id="sessionMeta" class="micro"></p>
         </div>
-        <div class="phase-actions">
-          <button id="startReflectionBtn" class="btn primary" type="button">Démarrer les 5 min</button>
-          <button id="startCorrectionBtn" class="btn success" type="button">Passer à la correction</button>
-          <button id="closeSessionBtn" class="btn ghost" type="button">Clore la séance</button>
-        </div>
+        <div class="timer-box"><strong id="sessionTimer"></strong></div>
       </div>
-      <div id="teacherSessionQuestions" class="question-grid"></div>
+      <div class="phase-actions">
+        <button id="startReflection" class="btn primary" type="button">Démarrer les 5 min</button>
+        <button id="startCorrection" class="btn success" type="button">Passer à la correction</button>
+        <button id="closeSession" class="btn ghost" type="button">Clore la séance</button>
+      </div>
+      <div id="sessionQuestions" class="question-grid"></div>
     </section>
 
-    <div id="teacherStats" class="stats"></div>
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">BANQUE</p>
+          <h2>Réactivations mémoire disponibles</h2>
+          <p class="micro">Active/désactive les questions, puis sélectionne exactement 4 questions.</p>
+        </div>
+        <label>Parcours
+          <select id="bankTrack">
+            <option value="TSMA">BTS TSMA</option>
+            <option value="MMCM">BTS MMCM</option>
+            <option value="BAC_PRO">Bac Pro Maintenance</option>
+            <option value="CAP">CAP Maintenance</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="section-head selection-bar">
+        <p id="selectionCount" class="micro">0 / 4 sélectionnée(s)</p>
+        <button id="createFromSelection" class="btn primary" type="button" disabled>Créer une séance avec ces 4 questions</button>
+      </div>
+
+      <div id="questionBank" class="bank-list"></div>
+      <p id="bankMsg" class="msg" role="status"></p>
+    </section>
 
     <section class="panel">
-      <h2>Suivi des élèves</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Élève</th><th>Parcours</th><th>Notions vues</th><th>Fragiles</th><th>Maîtrisées</th><th>Stables</th><th>Tentatives</th><th>Dernière activité</th><th>Actif</th></tr></thead>
-          <tbody id="studentsBody"></tbody>
-        </table>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">BIBLIOTHÈQUE</p>
+          <h2>Mes réactivations créées</h2>
+          <p class="micro">Rouvre une séance déjà préparée ou déjà utilisée.</p>
+        </div>
+        <label>Parcours
+          <select id="libraryTrack">
+            <option value="">Tous</option>
+            <option value="TSMA">BTS TSMA</option>
+            <option value="MMCM">BTS MMCM</option>
+            <option value="BAC_PRO">Bac Pro Maintenance</option>
+            <option value="CAP">CAP Maintenance</option>
+          </select>
+        </label>
       </div>
+      <div id="sessionLibrary" class="history-list"></div>
+    </section>
+
+    <section class="panel">
+      <p class="eyebrow">IMPORT</p>
+      <h2>Déposer une banque de réactivations</h2>
+      <p class="lead">Formats acceptés : .xlsx, .xls, .csv, .txt, .json.</p>
+      <p class="micro">Colonnes minimales : Parcours + Question + Réponse attendue.</p>
+      <input id="bankFile" type="file" accept=".xlsx,.xls,.csv,.txt,.json">
+      <div id="importPreview" class="hidden">
+        <p id="importSummary" class="micro"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Parcours</th><th>Séquence</th><th>Notion</th><th>Question</th><th>Réponse</th></tr></thead>
+            <tbody id="importPreviewBody"></tbody>
+          </table>
+        </div>
+        <button id="importBank" class="btn primary" type="button">Importer dans la banque</button>
+      </div>
+      <p id="importMsg" class="msg" role="status"></p>
+    </section>
+  </section>
+
+  <section id="archiveView" class="hidden">
+    <section class="hero panel">
+      <div>
+        <p id="archiveTrack" class="eyebrow"></p>
+        <h1>Réactivations mémoire</h1>
+        <p class="lead">Séances clôturées à revoir en autonomie.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Choisir une séance</h2>
+      <div id="archiveList" class="history-list"></div>
+    </section>
+
+    <section id="archiveDetail" class="hidden">
+      <section class="panel">
+        <h2 id="archiveTitle"></h2>
+      </section>
+      <div id="archiveQuestions" class="question-grid"></div>
     </section>
   </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?rev=202610061140" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="reactivation-v2.js?rev=7" defer></script>
 </body>
 </html>
