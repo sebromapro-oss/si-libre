@@ -3,17 +3,16 @@ const SUPABASE_KEY='sb_publishable_Pi8cQCzTW30Thxlv3443NA_fXn1j9WO';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
-
 const loginView=$('#loginView');
 const studentView=$('#studentView');
 const teacherView=$('#teacherView');
 const publicArchiveView=$('#publicArchiveView');
 const logoutBtn=$('#logoutBtn');
-
 const labels={TSMA:'BTS TSMA',MMCM:'BTS MMCM',BAC_PRO:'Bac Pro Maintenance',CAP:'CAP Maintenance'};
 let teacherToken=sessionStorage.getItem('si_reactivation_teacher_token')||'';
 let teacherSession=null;
 let timerHandle=null;
+let setupMode=false;
 
 function show(el){if(el)el.classList.remove('hidden')}
 function hide(el){if(el)el.classList.add('hidden')}
@@ -22,17 +21,10 @@ function fmtDate(v){return v?new Date(v).toLocaleDateString('fr-FR'):'—'}
 
 function questionCard(q,pos,reveal){
   return `<article class="panel mini-question">
-    <div class="question-meta">
-      <span class="tag">Q${pos}</span>
-      <span class="tag soft">${esc(q.sequence||'')}</span>
-      <span class="tag soft">${esc(q.theme||'')}</span>
-    </div>
+    <div class="question-meta"><span class="tag">Q${pos}</span><span class="tag soft">${esc(q.sequence||'')}</span><span class="tag soft">${esc(q.theme||'')}</span></div>
     <p class="eyebrow">${esc(q.notion||'')}</p>
     <h3>${esc(q.question)}</h3>
-    ${reveal?`<div class="answer compact">
-      <p class="answer-label">Réponse attendue</p>
-      <p>${esc(q.answer)}</p>
-    </div>`:''}
+    ${reveal?`<div class="answer compact"><p class="answer-label">Réponse attendue</p><p>${esc(q.answer)}</p></div>`:''}
   </article>`;
 }
 
@@ -44,6 +36,13 @@ function phaseLabel(status){
 }
 
 async function init(){
+  if('serviceWorker' in navigator){
+    try{
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }catch{}
+  }
+
   const params=new URLSearchParams(window.location.search);
   const archiveTrack=(params.get('track')||'').toUpperCase();
 
@@ -54,13 +53,42 @@ async function init(){
   }
 
   hide(studentView);hide(publicArchiveView);
+
   if(teacherToken){
     const ok=await enterTeacher();
     if(ok)return;
     sessionStorage.removeItem('si_reactivation_teacher_token');
     teacherToken='';
   }
+
+  const {data,error}=await db.rpc('reactivation_teacher_setup_status');
+  setupMode=!error&&!data?.configured;
+  renderLoginMode();
   resetToLogin();
+}
+
+function renderLoginMode(){
+  const confirmWrap=$('#confirmWrap');
+  const submit=$('#loginSubmitBtn');
+  const help=$('#loginHelp');
+  const title=loginView?.querySelector('h1');
+  const lead=loginView?.querySelector('.lead');
+
+  if(setupMode){
+    show(confirmWrap);
+    $('#passwordConfirm').required=true;
+    if(title)title.textContent='Créer mon accès professeur.';
+    if(lead)lead.textContent='Première connexion : choisis ton identifiant et ton mot de passe. Ils serviront ensuite à toutes tes séances.';
+    if(submit)submit.textContent='Créer mon accès professeur';
+    if(help)help.textContent='Un seul compte professeur est créé. Les élèves n’ont aucun compte à créer ici.';
+  }else{
+    hide(confirmWrap);
+    $('#passwordConfirm').required=false;
+    if(title)title.textContent='Piloter la réactivation mémoire en classe.';
+    if(lead)lead.textContent='Connexion réservée à l’enseignant : 4 questions communes, 5 min de réflexion, puis 10 min de correction active.';
+    if(submit)submit.textContent='Se connecter';
+    if(help)help.textContent='Les élèves utilisent leur site TSMA, MMCM, Bac Pro ou CAP habituel pour revoir les séances clôturées.';
+  }
 }
 
 function resetToLogin(){
@@ -70,24 +98,35 @@ function resetToLogin(){
 
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();
-  const login=$('#email').value.trim().toUpperCase();
+  const login=$('#email').value.trim();
   const password=$('#password').value;
-  $('#loginMsg').textContent='Connexion…';
+  const confirm=$('#passwordConfirm')?.value||'';
+  $('#loginMsg').textContent=setupMode?'Création de l’accès…':'Connexion…';
 
-  const {data,error}=await db.rpc('reactivation_teacher_login',{
-    p_login:login,
-    p_password:password
-  });
+  if(setupMode&&password!==confirm){
+    $('#loginMsg').textContent='Les deux mots de passe sont différents.';
+    return;
+  }
+
+  const rpc=setupMode?'reactivation_teacher_register':'reactivation_teacher_login';
+  const {data,error}=await db.rpc(rpc,{p_login:login,p_password:password});
 
   if(error||!data?.ok||!data?.token){
-    $('#loginMsg').textContent='Connexion impossible. Vérifie ton identifiant et ton mot de passe.';
+    const code=data?.error||'';
+    $('#loginMsg').textContent=
+      code==='invalid_login'?'Identifiant invalide : 4 à 32 caractères, lettres/chiffres/tiret/underscore.':
+      code==='weak_password'?'Mot de passe trop court : 10 caractères minimum.':
+      code==='already_configured'?'Un accès professeur existe déjà. Recharge la page pour te connecter.':
+      'Connexion impossible.';
     return;
   }
 
   teacherToken=data.token;
   sessionStorage.setItem('si_reactivation_teacher_token',teacherToken);
   $('#password').value='';
+  if($('#passwordConfirm'))$('#passwordConfirm').value='';
   $('#loginMsg').textContent='';
+  setupMode=false;
   await enterTeacher();
 });
 
@@ -95,6 +134,8 @@ logoutBtn.addEventListener('click',()=>{
   teacherToken='';
   sessionStorage.removeItem('si_reactivation_teacher_token');
   teacherSession=null;
+  setupMode=false;
+  renderLoginMode();
   resetToLogin();
 });
 
@@ -115,7 +156,7 @@ async function enterTeacher(){
 
   const studentsBody=$('#studentsBody');
   if(studentsBody){
-    studentsBody.innerHTML='<tr><td colspan="9">Le suivi individuel reste dans les sites TSMA, MMCM, Bac Pro et CAP. SI Réactivation sert au pilotage collectif de classe.</td></tr>';
+    studentsBody.innerHTML='<tr><td colspan="9">Le suivi individuel reste dans les sites TSMA, MMCM, Bac Pro et CAP. Ici : pilotage collectif de la réactivation mémoire.</td></tr>';
   }
 
   await loadLatestTeacherSession();
@@ -174,7 +215,6 @@ function startTeacherTimer(){
       ?(teacherSession.correction_minutes||10)
       :0;
 
-  const meta=$('#teacherSessionMeta');
   if(!mins)return;
 
   const started=new Date(teacherSession.updated_at||Date.now()).getTime();
@@ -184,8 +224,7 @@ function startTeacherTimer(){
     const left=Math.max(0,end-Date.now());
     const m=String(Math.floor(left/60000)).padStart(2,'0');
     const s=String(Math.floor((left%60000)/1000)).padStart(2,'0');
-    const base=(labels[teacherSession.track]||teacherSession.track)+' • '+phaseLabel(teacherSession.status);
-    meta.textContent=base+' • '+m+':'+s;
+    $('#teacherSessionMeta').textContent=(labels[teacherSession.track]||teacherSession.track)+' • '+phaseLabel(teacherSession.status)+' • '+m+':'+s;
   };
 
   tick();
@@ -222,24 +261,20 @@ async function loadPublicArchive(track){
   $('#archiveTrackBadge').textContent=labels[track]||track;
   const list=$('#publicArchiveList');
   list.innerHTML='<p class="micro">Chargement des séances…</p>';
-
   try{
     const url=SUPABASE_URL+'/functions/v1/reactivation-public-archive?track='+encodeURIComponent(track);
     const res=await fetch(url);
     if(!res.ok)throw new Error('archive');
     const data=await res.json();
     const sessions=data.sessions||[];
-
     if(!sessions.length){
       list.innerHTML='<p class="lead">Aucune séance clôturée pour le moment.</p>';
       return;
     }
-
     list.innerHTML=sessions.map(s=>`<button class="history-item public-session" data-id="${esc(s.id)}" type="button">
       <span><strong>${esc(s.title)}</strong><small>${fmtDate(s.session_date)}</small></span>
       <span class="tag soft">${s.questions.length} questions</span>
     </button>`).join('');
-
     $$('.public-session').forEach(b=>b.addEventListener('click',()=>{
       const s=sessions.find(x=>x.id===b.dataset.id);
       if(s)renderPublicArchiveSession(s);
@@ -264,9 +299,5 @@ $('#archiveBackBtn')?.addEventListener('click',()=>{
   hide($('#publicArchiveDetail'));
   window.scrollTo({top:0,behavior:'smooth'});
 });
-
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-}
 
 init();
