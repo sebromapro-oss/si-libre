@@ -13,6 +13,7 @@ let teacherToken=sessionStorage.getItem('si_reactivation_teacher_token')||'';
 let teacherSession=null;
 let timerHandle=null;
 let setupMode=true;
+let importRows=[];
 
 function show(el){if(el)el.classList.remove('hidden')}
 function hide(el){if(el)el.classList.add('hidden')}
@@ -168,7 +169,7 @@ async function enterTeacher(){
     studentsBody.innerHTML='<tr><td colspan="9">Le suivi individuel reste dans les sites TSMA, MMCM, Bac Pro et CAP. Ici : pilotage collectif de la réactivation mémoire.</td></tr>';
   }
 
-  await loadLatestTeacherSession();
+  await Promise.all([loadLatestTeacherSession(),loadSessionLibrary()]);
   return true;
 }
 
@@ -310,3 +311,83 @@ $('#archiveBackBtn')?.addEventListener('click',()=>{
 });
 
 init();
+async function loadSessionLibrary(){
+  const box=$('#sessionLibrary');
+  if(!box)return;
+  box.innerHTML='<p class="micro">Chargement…</p>';
+  const track=$('#libraryTrack')?.value||'';
+  const {data,error}=await db.rpc('reactivation_teacher_list_sessions',{p_token:teacherToken,p_track:track||null,p_limit:150});
+  if(error){box.innerHTML='<p class="msg">Impossible de charger les réactivations.</p>';return;}
+  const rows=Array.isArray(data)?data:[];
+  if(!rows.length){box.innerHTML='<p class="micro">Aucune réactivation créée pour ce filtre.</p>';return;}
+  box.innerHTML=rows.map(s=>'<button class="history-item teacher-session-item" data-id="'+esc(s.id)+'" type="button"><span><strong>'+esc(s.title)+'</strong><small>'+fmtDate(s.session_date)+' · '+esc(labels[s.track]||s.track)+' · '+esc(s.status)+'</small></span><span class="tag soft">'+(s.question_count||0)+' questions</span></button>').join('');
+  $$('.teacher-session-item').forEach(btn=>btn.addEventListener('click',()=>openTeacherSession(btn.dataset.id)));
+}
+
+async function openTeacherSession(id){
+  $('#teacherMsg').textContent='Ouverture de la séance…';
+  const {data,error}=await db.rpc('reactivation_teacher_get_session',{p_token:teacherToken,p_session_id:id});
+  if(error||!data){$('#teacherMsg').textContent='Impossible d’ouvrir cette séance.';return;}
+  teacherSession=data;
+  $('#teacherMsg').textContent='';
+  renderTeacherSession();
+  window.scrollTo({top:$('#teacherSessionPanel').offsetTop-90,behavior:'smooth'});
+}
+
+$('#libraryTrack')?.addEventListener('change',loadSessionLibrary);
+
+function normalizeHeader(s){return String(s??'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ');}
+function rowValue(obj,aliases){const map={};Object.keys(obj||{}).forEach(k=>map[normalizeHeader(k)]=obj[k]);for(const a of aliases){const v=map[normalizeHeader(a)];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();}return '';}
+function normalizeImportedRow(raw){return {
+  id:rowValue(raw,['ID','id']),
+  track:rowValue(raw,['Parcours','Niveau','track']),
+  sequence:rowValue(raw,['Séquence','Sequence','sequence']),
+  theme:rowValue(raw,['Thème','Theme','theme']),
+  notion:rowValue(raw,['Notion','notion']),
+  type:rowValue(raw,['Type','type']),
+  question:rowValue(raw,['Question / rappel','Question','question']),
+  answer:rowValue(raw,['Réponse attendue','Reponse attendue','Réponse','Reponse','answer']),
+  difficulty:rowValue(raw,['Difficulté','Difficulte','difficulty']),
+  origin:rowValue(raw,['Origine','origin']),
+  status:rowValue(raw,['Statut','status']),
+  source:rowValue(raw,['Source','source'])
+};}
+
+function parseDelimited(text){
+  const lines=String(text||'').replace(/^\uFEFF/,'').split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length)return [];
+  const first=lines[0];
+  const delimiter=first.includes(';')?';':first.includes('\t')?'\t':',';
+  const headers=first.split(delimiter).map(x=>x.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line=>{const vals=line.split(delimiter).map(x=>x.replace(/^"|"$/g,'').trim());const obj={};headers.forEach((h,i)=>obj[h]=vals[i]??'');return obj;});
+}
+
+async function parseBankFile(file){
+  const name=file.name.toLowerCase();
+  if(name.endsWith('.json')){const parsed=JSON.parse(await file.text());return Array.isArray(parsed)?parsed:(Array.isArray(parsed.rows)?parsed.rows:[parsed]);}
+  if(name.endsWith('.xlsx')||name.endsWith('.xls')){if(!window.XLSX)throw new Error('xlsx');const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];return XLSX.utils.sheet_to_json(ws,{defval:''});}
+  return parseDelimited(await file.text());
+}
+
+$('#bankFile')?.addEventListener('change',async e=>{
+  const file=e.target.files?.[0];
+  importRows=[];hide($('#importPreview'));$('#importMsg').textContent='';
+  if(!file)return;
+  try{
+    const raw=await parseBankFile(file);
+    importRows=raw.map(normalizeImportedRow);
+    const valid=importRows.filter(r=>r.track&&r.question&&r.answer);
+    $('#importSummary').textContent=importRows.length+' ligne(s) détectée(s) · '+valid.length+' avec Parcours + Question + Réponse.';
+    $('#importPreviewBody').innerHTML=importRows.slice(0,12).map(r=>'<tr><td>'+esc(r.track)+'</td><td>'+esc(r.sequence)+'</td><td>'+esc(r.notion)+'</td><td>'+esc(r.question)+'</td><td>'+esc(r.answer)+'</td></tr>').join('');
+    show($('#importPreview'));
+  }catch{$('#importMsg').textContent='Fichier non lisible. Utilise .xlsx, .csv, .txt ou .json.';}
+});
+
+$('#importBankBtn')?.addEventListener('click',async()=>{
+  if(!importRows.length)return;
+  $('#importMsg').textContent='Import en cours…';
+  const {data,error}=await db.rpc('reactivation_teacher_import_questions',{p_token:teacherToken,p_rows:importRows});
+  if(error||!data?.ok){$('#importMsg').textContent='Import impossible.';return;}
+  $('#importMsg').textContent='Import terminé : '+(data.imported||0)+' intégrée(s), '+(data.skipped||0)+' ignorée(s).';
+  await enterTeacher();
+});
