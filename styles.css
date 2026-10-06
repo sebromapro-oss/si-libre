@@ -34,3 +34,17 @@ button{cursor:pointer}
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}th{font-size:.8rem;color:var(--muted);text-transform:uppercase}
 @media(max-width:720px){.hero{grid-template-columns:1fr}.progress-card{min-width:0}.stats{grid-template-columns:repeat(2,1fr)}.panel{padding:18px}.shell{padding-top:18px}.topbar{padding:10px 14px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+.mode-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+.mode-btn{border:1px solid var(--line);background:#fff;color:var(--blue2);padding:11px 15px;border-radius:999px;font-weight:800}
+.mode-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.session-head{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.timer-card{min-width:170px;text-align:center;padding:16px;border-radius:14px;background:#eef6fb;border:1px solid #cfe0ec}
+.timer-card span{display:block;color:var(--muted);font-size:.82rem}.timer-card strong{font-size:2rem;color:var(--blue2)}
+.question-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.mini-question{min-height:250px}.mini-question h3{font-size:1.2rem;line-height:1.35;margin:.35rem 0 1rem}
+.answer.compact{margin-top:14px}.compact-rating{gap:8px}.compact-rating .btn{min-height:40px;padding:9px 12px}
+.notice{border-left:5px solid var(--green);background:#f3faf6}
+.history-list{display:grid;gap:10px;margin-top:18px}.history-item{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px 16px}.history-item:hover{background:#f7fafc}.history-item span:first-child{display:grid;gap:2px}.history-item small{color:var(--muted)}
+.teacher-launch .launch-grid{display:grid;grid-template-columns:180px minmax(220px,1fr) auto;gap:12px;align-items:end}.teacher-launch label{font-weight:700;font-size:.9rem}.teacher-launch input,.teacher-launch select{display:block;width:100%;margin-top:6px;padding:12px 13px;border:1px solid #b9c8d4;border-radius:10px;background:#fff}
+.phase-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:820px){.question-grid{grid-template-columns:1fr}.session-head{align-items:flex-start;flex-direction:column}.timer-card{width:100%}.teacher-launch .launch-grid{grid-template-columns:1fr}.phase-actions{justify-content:flex-start}}
