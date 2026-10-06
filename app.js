@@ -14,6 +14,7 @@ let teacherSession=null;
 let timerHandle=null;
 let setupMode=true;
 let importRows=[];
+let selectedBankQuestions=new Set();
 
 function show(el){if(el)el.classList.remove('hidden')}
 function hide(el){if(el)el.classList.add('hidden')}
@@ -169,7 +170,7 @@ async function enterTeacher(){
     studentsBody.innerHTML='<tr><td colspan="9">Le suivi individuel reste dans les sites TSMA, MMCM, Bac Pro et CAP. Ici : pilotage collectif de la réactivation mémoire.</td></tr>';
   }
 
-  await Promise.all([loadLatestTeacherSession(),loadSessionLibrary()]);
+  await Promise.all([loadLatestTeacherSession(),loadSessionLibrary(),loadQuestionBank()]);
   return true;
 }
 
@@ -390,4 +391,119 @@ $('#importBankBtn')?.addEventListener('click',async()=>{
   if(error||!data?.ok){$('#importMsg').textContent='Import impossible.';return;}
   $('#importMsg').textContent='Import terminé : '+(data.imported||0)+' intégrée(s), '+(data.skipped||0)+' ignorée(s).';
   await enterTeacher();
+});
+
+async function loadQuestionBank(){
+  const box=$('#questionBank');
+  if(!box)return;
+  const track=$('#bankTrack')?.value||'TSMA';
+  selectedBankQuestions.clear();
+  updateBankSelectionUi();
+  box.innerHTML='<p class="micro">Chargement de la banque…</p>';
+
+  const {data,error}=await db.rpc('reactivation_teacher_list_questions',{
+    p_token:teacherToken,
+    p_track:track,
+    p_active_only:false,
+    p_limit:500
+  });
+
+  if(error){
+    box.innerHTML='<p class="msg">Impossible de charger la banque.</p>';
+    return;
+  }
+
+  const rows=Array.isArray(data)?data:[];
+  if(!rows.length){
+    box.innerHTML='<p class="micro">Aucune réactivation dans ce parcours.</p>';
+    return;
+  }
+
+  box.innerHTML=rows.map(q=>{
+    const state=q.active?'Active':'Inactive';
+    const stateClass=q.active?'success':'ghost';
+    return '<article class="history-item bank-question" data-id="'+esc(q.id)+'" data-track="'+esc(q.track)+'">'+
+      '<span><strong>'+esc(q.sequence||'Sans séquence')+' · '+esc(q.notion||'Notion')+'</strong>'+
+      '<small>'+esc(q.question)+'</small></span>'+
+      '<span class="actions">'+
+        '<button class="btn '+stateClass+' bank-toggle" type="button" data-active="'+String(q.active)+'">'+state+'</button>'+
+        '<label class="bank-select-label"><input class="bank-select" type="checkbox" '+(q.active?'':'disabled')+'> Sélectionner</label>'+
+      '</span>'+
+    '</article>';
+  }).join('');
+
+  $$('.bank-toggle').forEach(btn=>btn.addEventListener('click',async()=>{
+    const article=btn.closest('.bank-question');
+    if(!article)return;
+    const currentlyActive=btn.dataset.active==='true';
+    const {data:result,error:toggleError}=await db.rpc('reactivation_teacher_set_question_active',{
+      p_token:teacherToken,
+      p_track:article.dataset.track,
+      p_question_id:article.dataset.id,
+      p_active:!currentlyActive
+    });
+    if(toggleError||!result?.ok){
+      $('#questionBankMsg').textContent='Modification impossible.';
+      return;
+    }
+    $('#questionBankMsg').textContent=!currentlyActive?'Réactivation activée.':'Réactivation désactivée.';
+    await loadQuestionBank();
+    await enterTeacher();
+  }));
+
+  $$('.bank-select').forEach(cb=>cb.addEventListener('change',()=>{
+    const article=cb.closest('.bank-question');
+    if(!article)return;
+    const key=article.dataset.id;
+    if(cb.checked){
+      if(selectedBankQuestions.size>=4){
+        cb.checked=false;
+        $('#questionBankMsg').textContent='Tu peux sélectionner exactement 4 réactivations.';
+        return;
+      }
+      selectedBankQuestions.add(key);
+    }else{
+      selectedBankQuestions.delete(key);
+    }
+    updateBankSelectionUi();
+  }));
+}
+
+function updateBankSelectionUi(){
+  const count=$('#bankSelectionCount');
+  const button=$('#createSelectedSessionBtn');
+  if(count)count.textContent=selectedBankQuestions.size+' / 4 sélectionnée(s)';
+  if(button)button.disabled=selectedBankQuestions.size!==4;
+}
+
+$('#bankTrack')?.addEventListener('change',()=>{
+  $('#questionBankMsg').textContent='';
+  loadQuestionBank();
+});
+
+$('#createSelectedSessionBtn')?.addEventListener('click',async()=>{
+  if(selectedBankQuestions.size!==4)return;
+  const track=$('#bankTrack').value;
+  const title=$('#sessionTitle').value.trim()||'Réactivation du jour';
+  $('#questionBankMsg').textContent='Création de la séance…';
+
+  const {data,error}=await db.rpc('reactivation_teacher_create_session_from_questions',{
+    p_token:teacherToken,
+    p_track:track,
+    p_title:title,
+    p_question_ids:[...selectedBankQuestions]
+  });
+
+  if(error||!data){
+    $('#questionBankMsg').textContent='Impossible de créer la séance avec cette sélection.';
+    return;
+  }
+
+  teacherSession=data;
+  $('#questionBankMsg').textContent='Séance créée avec les 4 réactivations sélectionnées.';
+  selectedBankQuestions.clear();
+  updateBankSelectionUi();
+  renderTeacherSession();
+  await loadSessionLibrary();
+  window.scrollTo({top:$('#teacherSessionPanel').offsetTop-90,behavior:'smooth'});
 });
