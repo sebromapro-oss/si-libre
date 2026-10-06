@@ -27,19 +27,29 @@
 <main id="main" class="shell">
   <section id="loginView" class="panel auth-panel">
     <p class="eyebrow">ACCÈS ENSEIGNANT</p>
-    <h1>Piloter la réactivation mémoire en classe.</h1>
-    <p class="lead">Connexion réservée à l’enseignant : 4 questions communes, 5 min de réflexion, puis 10 min de correction active au vidéoprojecteur.</p>
+    <h1>SI Réactivation</h1>
+    <p class="lead">Choisis ce que tu veux faire.</p>
+
+    <div class="mode-tabs" role="tablist" aria-label="Accès professeur">
+      <button id="showCreateBtn" class="mode-btn active" type="button">Créer mon accès professeur</button>
+      <button id="showLoginBtn" class="mode-btn" type="button">J’ai déjà un accès</button>
+    </div>
+
     <form id="loginForm" class="form">
       <label>Identifiant
-        <input id="email" type="text" autocomplete="username" placeholder="PROF-SI" required>
+        <input id="email" type="text" autocomplete="username" placeholder="Choisis ton identifiant" required>
       </label>
       <label>Mot de passe
-        <input id="password" type="password" autocomplete="current-password" required>
+        <input id="password" type="password" autocomplete="new-password" required>
       </label>
-      <button class="btn primary" type="submit">Se connecter</button>
+      <label id="confirmWrap">Confirmer le mot de passe
+        <input id="passwordConfirm" type="password" autocomplete="new-password" required>
+      </label>
+      <button id="loginSubmitBtn" class="btn primary" type="submit">Créer mon accès professeur</button>
     </form>
+
     <p id="loginMsg" class="msg" role="status" aria-live="polite"></p>
-    <p class="micro">Les élèves n’ont pas besoin de compte ici : ils retrouvent les séances clôturées depuis leur site TSMA, MMCM, Bac Pro ou CAP avec leur accès habituel.</p>
+    <p id="loginHelp" class="micro">Premier accès : crée toi-même ton identifiant et ton mot de passe. Les élèves n’ont aucun compte à créer ici.</p>
   </section>
 
   <section id="publicArchiveView" class="hidden">
