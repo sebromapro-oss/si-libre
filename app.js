@@ -4,7 +4,7 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 
-const loginView=$('#loginView'),studentView=$('#studentView'),teacherView=$('#teacherView'),logoutBtn=$('#logoutBtn');
+const loginView=$('#loginView'),studentView=$('#studentView'),teacherView=$('#teacherView'),publicArchiveView=$('#publicArchiveView'),logoutBtn=$('#logoutBtn');
 let session=null,profile=null,questions=[],states=[],freeQueue=[],freeIndex=0,freeCurrent=null,currentClassSession=null,classQuestions=[],teacherSession=null,timerHandle=null;
 const stageOrder=['J0','J+2','J+7','J+21','J+45','J+90'];
 const stageDays={'J0':0,'J+2':2,'J+7':7,'J+21':21,'J+45':45,'J+90':90};
@@ -29,13 +29,20 @@ function dueFor(stage,result){
 function fmtDate(v){return v?new Date(v).toLocaleDateString('fr-FR'):'—'}
 
 async function init(){
+  const params=new URLSearchParams(window.location.search);
+  const archiveTrack=(params.get('track')||'').toUpperCase();
+  if(params.get('mode')==='archive'&&['TSMA','MMCM','BAC_PRO','CAP'].includes(archiveTrack)){
+    hide(loginView);hide(studentView);hide(teacherView);hide(logoutBtn);show(publicArchiveView);
+    await loadPublicArchive(archiveTrack);
+    return;
+  }
   const {data:{session:s}}=await db.auth.getSession();session=s;
   db.auth.onAuthStateChange((_e,s2)=>{session=s2;if(!s2)resetToLogin()});
   if(session)await enterApp();else resetToLogin();
 }
 function resetToLogin(){
   session=profile=null;
-  hide(studentView);hide(teacherView);hide(logoutBtn);show(loginView);
+  hide(studentView);hide(teacherView);hide(publicArchiveView);hide(logoutBtn);show(loginView);
 }
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();$('#loginMsg').textContent='Connexion…';
@@ -283,3 +290,36 @@ $('#closeSessionBtn').addEventListener('click',()=>setTeacherPhase('closed'));
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 init();
+
+async function loadPublicArchive(track){
+  $('#archiveTrackBadge').textContent=labels[track]||track;
+  const list=$('#publicArchiveList');
+  list.innerHTML='<p class="micro">Chargement des séances…</p>';
+  try{
+    const url=SUPABASE_URL+'/functions/v1/reactivation-public-archive?track='+encodeURIComponent(track);
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('archive');
+    const data=await res.json();
+    const sessions=data.sessions||[];
+    if(!sessions.length){list.innerHTML='<p class="lead">Aucune séance clôturée pour le moment.</p>';return}
+    list.innerHTML=sessions.map(s=>`<button class="history-item public-session" data-id="${esc(s.id)}" type="button">
+      <span><strong>${esc(s.title)}</strong><small>${fmtDate(s.session_date)}</small></span>
+      <span class="tag soft">${s.questions.length} questions</span>
+    </button>`).join('');
+    $$('.public-session').forEach(b=>b.addEventListener('click',()=>{
+      const s=sessions.find(x=>x.id===b.dataset.id);if(s)renderPublicArchiveSession(s);
+    }));
+  }catch(e){
+    list.innerHTML='<p class="msg">Impossible de charger les séances pour le moment.</p>';
+  }
+}
+function renderPublicArchiveSession(s){
+  hide($('#publicArchiveList').closest('.panel'));show($('#publicArchiveDetail'));
+  $('#archiveSessionMeta').textContent='Séance du '+fmtDate(s.session_date)+' • correction autonome';
+  $('#archiveSessionTitle').textContent=s.title;
+  $('#publicArchiveQuestions').innerHTML=(s.questions||[]).map((q,i)=>questionCard(q,i+1,true,false)).join('');
+}
+$('#archiveBackBtn')?.addEventListener('click',()=>{
+  show($('#publicArchiveList').closest('.panel'));hide($('#publicArchiveDetail'));
+  window.scrollTo({top:0,behavior:'smooth'});
+});
