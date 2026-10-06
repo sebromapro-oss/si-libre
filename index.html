@@ -211,6 +211,30 @@
     <section class="panel">
       <div class="section-head">
         <div>
+          <p class="eyebrow">BANQUE</p>
+          <h2>Banque des réactivations mémoire</h2>
+          <p class="micro">Active les réactivations disponibles, puis sélectionne exactement 4 questions pour créer une séance.</p>
+        </div>
+        <label>Parcours
+          <select id="bankTrack">
+            <option value="TSMA">BTS TSMA</option>
+            <option value="MMCM">BTS MMCM</option>
+            <option value="BAC_PRO">Bac Pro Maintenance</option>
+            <option value="CAP">CAP Maintenance</option>
+          </select>
+        </label>
+      </div>
+      <div class="section-head">
+        <p id="bankSelectionCount" class="micro">0 / 4 sélectionnée(s)</p>
+        <button id="createSelectedSessionBtn" class="btn primary" type="button" disabled>Créer une séance avec ces 4 questions</button>
+      </div>
+      <div id="questionBank" class="history-list"></div>
+      <p id="questionBankMsg" class="msg" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
           <p class="eyebrow">BIBLIOTHÈQUE</p>
           <h2>Mes réactivations créées</h2>
           <p class="micro">Retrouver, rouvrir et relancer une séance déjà préparée.</p>
