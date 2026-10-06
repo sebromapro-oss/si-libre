@@ -1,5 +1,17 @@
 # SI Réactivation
 
+Outil dédié aux réactivations mémoire en Sciences Industrielles, utilisé à la fois en classe et en autonomie.
+
+## Fonctionnement pédagogique
+
+- **Séance de classe** : 4 questions communes.
+- **5 minutes de réflexion** : réponses masquées.
+- **10 minutes de correction active** : réponses attendues + auto-positionnement.
+- **Archive personnelle** : la même séance reste accessible pour un élève absent, en entreprise ou souhaitant la refaire.
+- **Révision libre** : séries individuelles en complément de la séance commune.
+- **Espacement mémoire** : J0 → J+2 → J+7 → J+21 → J+45 → J+90.
+
+
 Application unique de réactivation mémoire pour :
 - BTS TSMA
 - BTS MMCM
