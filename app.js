@@ -35,7 +35,32 @@ function phaseLabel(status){
          'SÉANCE PRÉPARÉE';
 }
 
+function ensureFirstRunControls(){
+  const form=$('#loginForm');
+  if(!form)return;
+  const password=$('#password');
+  if(!$('#confirmWrap')&&password?.parentElement){
+    const label=document.createElement('label');
+    label.id='confirmWrap';
+    label.className='hidden';
+    label.textContent='Confirmer le mot de passe';
+    const input=document.createElement('input');
+    input.id='passwordConfirm';
+    input.type='password';
+    input.autocomplete='new-password';
+    label.appendChild(input);
+    password.parentElement.insertAdjacentElement('afterend',label);
+  }
+  const submit=form.querySelector('button[type="submit"]');
+  if(submit&&!submit.id)submit.id='loginSubmitBtn';
+  const help=loginView?.querySelector('.micro');
+  if(help&&!help.id)help.id='loginHelp';
+  const ident=$('#email');
+  if(ident)ident.placeholder='Choisis ton identifiant';
+}
+
 async function init(){
+  ensureFirstRunControls();
   if('serviceWorker' in navigator){
     try{
       const regs=await navigator.serviceWorker.getRegistrations();
@@ -76,14 +101,14 @@ function renderLoginMode(){
 
   if(setupMode){
     show(confirmWrap);
-    $('#passwordConfirm').required=true;
+    if($('#passwordConfirm'))$('#passwordConfirm').required=true;
     if(title)title.textContent='Créer mon accès professeur.';
     if(lead)lead.textContent='Première connexion : choisis ton identifiant et ton mot de passe. Ils serviront ensuite à toutes tes séances.';
     if(submit)submit.textContent='Créer mon accès professeur';
     if(help)help.textContent='Un seul compte professeur est créé. Les élèves n’ont aucun compte à créer ici.';
   }else{
     hide(confirmWrap);
-    $('#passwordConfirm').required=false;
+    if($('#passwordConfirm'))$('#passwordConfirm').required=false;
     if(title)title.textContent='Piloter la réactivation mémoire en classe.';
     if(lead)lead.textContent='Connexion réservée à l’enseignant : 4 questions communes, 5 min de réflexion, puis 10 min de correction active.';
     if(submit)submit.textContent='Se connecter';
