@@ -26,9 +26,9 @@
 
 <main id="main" class="shell">
   <section id="loginView" class="panel auth-panel">
-    <p class="eyebrow">ACCÈS ÉLÈVES ET ENSEIGNANT</p>
-    <h1>La réactivation mémoire, en classe et en autonomie.</h1>
-    <p class="lead">Une même séance pour créer une dynamique de groupe, puis un accès personnel pour revoir, corriger et consolider.</p>
+    <p class="eyebrow">ACCÈS ENSEIGNANT</p>
+    <h1>Piloter la réactivation mémoire en classe.</h1>
+    <p class="lead">Connexion réservée à l’enseignant : 4 questions communes, 5 min de réflexion, puis 10 min de correction active au vidéoprojecteur.</p>
     <form id="loginForm" class="form">
       <label>Adresse e-mail
         <input id="email" type="email" autocomplete="username" required>
@@ -39,7 +39,34 @@
       <button class="btn primary" type="submit">Se connecter</button>
     </form>
     <p id="loginMsg" class="msg" role="status" aria-live="polite"></p>
-    <p class="micro">Les comptes sont créés par l’enseignant. Aucun accès public à la banque pédagogique.</p>
+    <p class="micro">Les élèves n’ont pas besoin de compte ici : ils retrouvent les séances clôturées depuis leur site TSMA, MMCM, Bac Pro ou CAP avec leur accès habituel.</p>
+  </section>
+
+  <section id="publicArchiveView" class="hidden">
+    <div class="hero panel">
+      <div>
+        <p id="archiveTrackBadge" class="eyebrow"></p>
+        <h1>Réactivations mémoire</h1>
+        <p class="lead">Revois une séance si tu étais absent, en entreprise, ou pour reprendre la correction en autonomie.</p>
+      </div>
+    </div>
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">SÉANCES CLÔTURÉES</p>
+          <h2>Choisir une réactivation</h2>
+        </div>
+      </div>
+      <div id="publicArchiveList" class="history-list"></div>
+    </section>
+    <section id="publicArchiveDetail" class="hidden">
+      <div class="panel">
+        <button id="archiveBackBtn" class="btn ghost" type="button">← Retour aux séances</button>
+        <p id="archiveSessionMeta" class="eyebrow"></p>
+        <h2 id="archiveSessionTitle"></h2>
+      </div>
+      <div id="publicArchiveQuestions" class="question-grid"></div>
+    </section>
   </section>
 
   <section id="studentView" class="hidden">
