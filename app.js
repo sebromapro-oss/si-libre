@@ -12,7 +12,7 @@ const labels={TSMA:'BTS TSMA',MMCM:'BTS MMCM',BAC_PRO:'Bac Pro Maintenance',CAP:
 let teacherToken=sessionStorage.getItem('si_reactivation_teacher_token')||'';
 let teacherSession=null;
 let timerHandle=null;
-let setupMode=false;
+let setupMode=true;
 
 function show(el){if(el)el.classList.remove('hidden')}
 function hide(el){if(el)el.classList.add('hidden')}
@@ -35,32 +35,43 @@ function phaseLabel(status){
          'SÉANCE PRÉPARÉE';
 }
 
-function ensureFirstRunControls(){
-  const form=$('#loginForm');
-  if(!form)return;
-  const password=$('#password');
-  if(!$('#confirmWrap')&&password?.parentElement){
-    const label=document.createElement('label');
-    label.id='confirmWrap';
-    label.className='hidden';
-    label.textContent='Confirmer le mot de passe';
-    const input=document.createElement('input');
-    input.id='passwordConfirm';
-    input.type='password';
-    input.autocomplete='new-password';
-    label.appendChild(input);
-    password.parentElement.insertAdjacentElement('afterend',label);
-  }
-  const submit=form.querySelector('button[type="submit"]');
-  if(submit&&!submit.id)submit.id='loginSubmitBtn';
-  const help=loginView?.querySelector('.micro');
-  if(help&&!help.id)help.id='loginHelp';
+function setAccessMode(createMode){
+  setupMode=createMode;
+  const createBtn=$('#showCreateBtn');
+  const loginBtn=$('#showLoginBtn');
+  const confirmWrap=$('#confirmWrap');
+  const submit=$('#loginSubmitBtn');
+  const help=$('#loginHelp');
   const ident=$('#email');
-  if(ident)ident.placeholder='Choisis ton identifiant';
+  const password=$('#password');
+  const confirm=$('#passwordConfirm');
+
+  if(createBtn)createBtn.classList.toggle('active',createMode);
+  if(loginBtn)loginBtn.classList.toggle('active',!createMode);
+
+  if(createMode){
+    show(confirmWrap);
+    if(confirm)confirm.required=true;
+    if(ident)ident.placeholder='Choisis ton identifiant';
+    if(password)password.autocomplete='new-password';
+    if(submit)submit.textContent='Créer mon accès professeur';
+    if(help)help.textContent='Premier accès : crée toi-même ton identifiant et ton mot de passe. Les élèves n’ont aucun compte à créer ici.';
+  }else{
+    hide(confirmWrap);
+    if(confirm){confirm.required=false;confirm.value='';}
+    if(ident)ident.placeholder='Ton identifiant';
+    if(password)password.autocomplete='current-password';
+    if(submit)submit.textContent='Se connecter';
+    if(help)help.textContent='Connexion professeur existante.';
+  }
+
+  $('#loginMsg').textContent='';
 }
 
+$('#showCreateBtn')?.addEventListener('click',()=>setAccessMode(true));
+$('#showLoginBtn')?.addEventListener('click',()=>setAccessMode(false));
+
 async function init(){
-  ensureFirstRunControls();
   if('serviceWorker' in navigator){
     try{
       const regs=await navigator.serviceWorker.getRegistrations();
@@ -86,34 +97,8 @@ async function init(){
     teacherToken='';
   }
 
-  const {data,error}=await db.rpc('reactivation_teacher_setup_status');
-  setupMode=!error&&!data?.configured;
-  renderLoginMode();
+  setAccessMode(true);
   resetToLogin();
-}
-
-function renderLoginMode(){
-  const confirmWrap=$('#confirmWrap');
-  const submit=$('#loginSubmitBtn');
-  const help=$('#loginHelp');
-  const title=loginView?.querySelector('h1');
-  const lead=loginView?.querySelector('.lead');
-
-  if(setupMode){
-    show(confirmWrap);
-    if($('#passwordConfirm'))$('#passwordConfirm').required=true;
-    if(title)title.textContent='Créer mon accès professeur.';
-    if(lead)lead.textContent='Première connexion : choisis ton identifiant et ton mot de passe. Ils serviront ensuite à toutes tes séances.';
-    if(submit)submit.textContent='Créer mon accès professeur';
-    if(help)help.textContent='Un seul compte professeur est créé. Les élèves n’ont aucun compte à créer ici.';
-  }else{
-    hide(confirmWrap);
-    if($('#passwordConfirm'))$('#passwordConfirm').required=false;
-    if(title)title.textContent='Piloter la réactivation mémoire en classe.';
-    if(lead)lead.textContent='Connexion réservée à l’enseignant : 4 questions communes, 5 min de réflexion, puis 10 min de correction active.';
-    if(submit)submit.textContent='Se connecter';
-    if(help)help.textContent='Les élèves utilisent leur site TSMA, MMCM, Bac Pro ou CAP habituel pour revoir les séances clôturées.';
-  }
 }
 
 function resetToLogin(){
@@ -159,8 +144,7 @@ logoutBtn.addEventListener('click',()=>{
   teacherToken='';
   sessionStorage.removeItem('si_reactivation_teacher_token');
   teacherSession=null;
-  setupMode=false;
-  renderLoginMode();
+  setAccessMode(false);
   resetToLogin();
 });
 
