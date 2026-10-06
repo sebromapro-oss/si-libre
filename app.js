@@ -45,10 +45,21 @@ function resetToLogin(){
   hide(studentView);hide(teacherView);hide(publicArchiveView);hide(logoutBtn);show(loginView);
 }
 $('#loginForm').addEventListener('submit',async e=>{
-  e.preventDefault();$('#loginMsg').textContent='Connexion…';
-  const {data,error}=await db.auth.signInWithPassword({email:$('#email').value.trim(),password:$('#password').value});
-  if(error){$('#loginMsg').textContent='Connexion impossible. Vérifie tes identifiants.';return}
-  session=data.session;$('#loginMsg').textContent='';await enterApp();
+  e.preventDefault();
+  const login=$('#email').value.trim().toUpperCase();
+  const password=$('#password').value;
+  const internalEmail=login==='PROF-SI'?'prof-si@local.invalid':'';
+  $('#loginMsg').textContent='Connexion…';
+  if(!internalEmail){$('#loginMsg').textContent='Identifiant inconnu.';return}
+  let auth=await db.auth.signInWithPassword({email:internalEmail,password});
+  if(auth.error){
+    const activation=await db.rpc('activate_reactivation_teacher',{p_login:login,p_password:password});
+    if(!activation.error&&activation.data===true){
+      auth=await db.auth.signInWithPassword({email:internalEmail,password});
+    }
+  }
+  if(auth.error){$('#loginMsg').textContent='Connexion impossible. Vérifie ton identifiant et ton mot de passe.';return}
+  session=auth.data.session;$('#loginMsg').textContent='';await enterApp();
 });
 logoutBtn.addEventListener('click',()=>db.auth.signOut());
 
