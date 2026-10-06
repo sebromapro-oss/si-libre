@@ -31,7 +31,7 @@ function setAccessMode(mode){
   $('#showCreateBtn')?.classList.toggle('active',registering);
   $('#showLoginBtn')?.classList.toggle('active',!registering);
   registering?show($('#confirmWrap')):hide($('#confirmWrap'));
-  if($('#passwordConfirm'))$('#passwordConfirm').required=registering;
+  if($('#loginPasswordConfirm'))$('#loginPasswordConfirm').required=registering;
   setText('#loginSubmitBtn',registering?'Créer mon accès professeur':'Se connecter');
   setText('#loginHelp',registering
     ?'Premier accès : choisis ton identifiant et ton mot de passe.'
