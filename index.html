@@ -209,6 +209,40 @@
     <div id="teacherStats" class="stats"></div>
 
     <section class="panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">BIBLIOTHÈQUE</p>
+          <h2>Mes réactivations créées</h2>
+          <p class="micro">Retrouver, rouvrir et relancer une séance déjà préparée.</p>
+        </div>
+        <label>Parcours
+          <select id="libraryTrack">
+            <option value="">Tous</option>
+            <option value="TSMA">BTS TSMA</option>
+            <option value="MMCM">BTS MMCM</option>
+            <option value="BAC_PRO">Bac Pro Maintenance</option>
+            <option value="CAP">CAP Maintenance</option>
+          </select>
+        </label>
+      </div>
+      <div id="sessionLibrary" class="history-list"></div>
+    </section>
+
+    <section class="panel">
+      <p class="eyebrow">IMPORT DE BANQUE</p>
+      <h2>Déposer des réactivations</h2>
+      <p class="lead">Formats acceptés : Excel .xlsx, CSV, TXT tabulé/point-virgule ou JSON.</p>
+      <p class="micro">Colonnes reconnues : Parcours, Séquence, Thème, Notion, Type, Question / rappel, Réponse attendue, Difficulté, Origine, Statut, Source. Les seules colonnes indispensables sont Parcours + Question + Réponse.</p>
+      <input id="bankFile" type="file" accept=".xlsx,.xls,.csv,.txt,.json,application/json,text/csv,text/plain">
+      <div id="importPreview" class="hidden">
+        <p id="importSummary" class="micro"></p>
+        <div class="table-wrap"><table><thead><tr><th>Parcours</th><th>Séquence</th><th>Notion</th><th>Question</th><th>Réponse</th></tr></thead><tbody id="importPreviewBody"></tbody></table></div>
+        <button id="importBankBtn" class="btn primary" type="button">Importer dans la banque</button>
+      </div>
+      <p id="importMsg" class="msg" role="status"></p>
+    </section>
+
+    <section class="panel">
       <h2>Suivi des élèves</h2>
       <div class="table-wrap">
         <table>
@@ -221,6 +255,7 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="app.js" defer></script>
 </body>
 </html>
