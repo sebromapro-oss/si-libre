@@ -169,9 +169,10 @@ function renderBank(rows){
         </summary>
         <div class="theme-question-list">
           ${questions.map(q=>`
-            <article class="bank-row" data-id="${esc(q.id)}" data-track="${esc(q.track)}">
+            <article class="bank-row ${q.active?'is-active':'is-inactive'} ${selectedIds.has(String(q.id))?'is-selected':''}" data-id="${esc(q.id)}" data-track="${esc(q.track)}">
               <div class="bank-main">
                 <div class="bank-meta">
+                  <span class="status-chip ${q.active?'active':'inactive'}">${q.active?'● ACTIVE':'○ INACTIVE'}</span>
                   <span class="tag soft">${esc(q.sequence||'Sans séquence')}</span>
                   <span class="tag soft">${esc(q.notion||'Sans notion')}</span>
                   <span class="tag soft">${esc(q.difficulty||'')}</span>
@@ -226,6 +227,7 @@ function renderBank(rows){
     }else{
       selectedIds.delete(id);
     }
+    check.closest('.bank-row')?.classList.toggle('is-selected',check.checked);
     updateSelectionCount();
   }));
 }
@@ -268,7 +270,7 @@ async function setSelectedActive(active){
         p_active:active
       });
     }
-    setText('#bankMsg',selected.length+' question(s) '+(active?'activée(s).':'désactivée(s).'));
+    setText('#bankMsg','✓ '+selected.length+' question(s) '+(active?'activée(s).':'désactivée(s).')+' Le statut ACTIVE / INACTIVE ci-dessous confirme le changement.');
     selectedIds.clear();
     await loadBank();
   }catch(err){
