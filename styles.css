@@ -66,3 +66,15 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:10px;backgro
 .question-card-mini h3{line-height:1.35}
 .timer-box{min-width:100px;text-align:center}.timer-box strong{font-size:2rem;color:var(--blue)}
 @media(max-width:820px){.launch-grid{grid-template-columns:1fr}.bank-row{grid-template-columns:1fr}.bank-actions{justify-content:flex-start}.section-head{align-items:flex-start;flex-direction:column;gap:10px}}
+
+.bank-filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.bank-filters label{min-width:190px}
+.selection-actions{display:flex;gap:10px;flex-wrap:wrap}
+.theme-group{border:1px solid var(--line);border-radius:16px;background:#f8fbfd;overflow:hidden}
+.theme-group>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;list-style:none}
+.theme-group>summary::-webkit-details-marker{display:none}
+.theme-group>summary span:first-child{display:grid;gap:2px}
+.theme-group>summary small{color:var(--muted);font-weight:500}
+.theme-question-list{display:grid;gap:10px;padding:0 12px 12px}
+.theme-question-list .bank-row{box-shadow:none}
+@media(max-width:820px){.bank-filters{width:100%}.bank-filters label{min-width:0;width:100%}.selection-actions{width:100%}.selection-actions .btn{width:100%}}
