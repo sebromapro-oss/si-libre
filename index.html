@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f4c81">
   <meta name="description" content="Réactivation mémoire en Sciences Industrielles">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?rev=7">
+  <link rel="stylesheet" href="styles.css?rev=8">
   <title>SI Réactivation</title>
 </head>
 <body>
@@ -104,19 +104,32 @@
           <h2>Réactivations mémoire disponibles</h2>
           <p class="micro">Active/désactive les questions, puis sélectionne exactement 4 questions.</p>
         </div>
-        <label>Parcours
-          <select id="bankTrack">
-            <option value="TSMA">BTS TSMA</option>
-            <option value="MMCM">BTS MMCM</option>
-            <option value="BAC_PRO">Bac Pro Maintenance</option>
-            <option value="CAP">CAP Maintenance</option>
-          </select>
-        </label>
+        <div class="bank-filters">
+          <label>Parcours
+            <select id="bankTrack">
+              <option value="TSMA">BTS TSMA</option>
+              <option value="MMCM">BTS MMCM</option>
+              <option value="BAC_PRO">Bac Pro Maintenance</option>
+              <option value="CAP">CAP Maintenance</option>
+            </select>
+          </label>
+          <label>Thème
+            <select id="bankTheme">
+              <option value="">Tous les thèmes</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <div class="section-head selection-bar">
-        <p id="selectionCount" class="micro">0 / 4 sélectionnée(s)</p>
-        <button id="createFromSelection" class="btn primary" type="button" disabled>Créer une séance avec ces 4 questions</button>
+        <div>
+          <p id="selectionCount" class="micro">0 / 4 sélectionnée(s)</p>
+          <p id="themeHelp" class="micro">Les questions sont regroupées par thème. Tu peux filtrer un thème ou sélectionner 4 questions librement.</p>
+        </div>
+        <div class="selection-actions">
+          <button id="selectRandomTheme" class="btn ghost" type="button">Choisir 4 au hasard dans le thème</button>
+          <button id="createFromSelection" class="btn primary" type="button" disabled>Créer une séance avec ces 4 questions</button>
+        </div>
       </div>
 
       <div id="questionBank" class="bank-list"></div>
@@ -147,13 +160,13 @@
       <p class="eyebrow">IMPORT</p>
       <h2>Déposer une banque de réactivations</h2>
       <p class="lead">Formats acceptés : .xlsx, .xls, .csv, .txt, .json.</p>
-      <p class="micro">Colonnes minimales : Parcours + Question + Réponse attendue.</p>
+      <p class="micro">Colonnes minimales : Parcours + Question + Réponse attendue. Colonne recommandée : Thème, pour ranger automatiquement les groupes de questions.</p>
       <input id="bankFile" type="file" accept=".xlsx,.xls,.csv,.txt,.json">
       <div id="importPreview" class="hidden">
         <p id="importSummary" class="micro"></p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Parcours</th><th>Séquence</th><th>Notion</th><th>Question</th><th>Réponse</th></tr></thead>
+            <thead><tr><th>Parcours</th><th>Thème</th><th>Séquence</th><th>Notion</th><th>Question</th><th>Réponse</th></tr></thead>
             <tbody id="importPreviewBody"></tbody>
           </table>
         </div>
@@ -188,6 +201,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="reactivation-v2.js?rev=7" defer></script>
+<script src="reactivation-v2.js?rev=8" defer></script>
 </body>
 </html>
