@@ -184,7 +184,7 @@ function renderBank(rows){
                   ${q.active?'Active':'Inactive'}
                 </button>
                 <label class="select-question">
-                  <input class="question-check" type="checkbox" ${q.active?'':'disabled'} ${selectedIds.has(String(q.id))?'checked':''}>
+                  <input class="question-check" type="checkbox" ${selectedIds.has(String(q.id))?'checked':''}>
                   Sélectionner
                 </label>
               </div>
@@ -246,6 +246,35 @@ function selectRandomFromTheme(){
 function updateSelectionCount(){
   setText('#selectionCount',selectedIds.size+' / 4 sélectionnée(s)');
   if($('#createFromSelection'))$('#createFromSelection').disabled=selectedIds.size!==4;
+  if($('#activateSelection'))$('#activateSelection').disabled=selectedIds.size===0;
+  if($('#deactivateSelection'))$('#deactivateSelection').disabled=selectedIds.size===0;
+}
+
+async function setSelectedActive(active){
+  if(!selectedIds.size)return;
+  const selected=currentBankRows.filter(q=>selectedIds.has(String(q.id)));
+  if(!selected.length)return;
+  const activateBtn=$('#activateSelection');
+  const deactivateBtn=$('#deactivateSelection');
+  if(activateBtn)activateBtn.disabled=true;
+  if(deactivateBtn)deactivateBtn.disabled=true;
+  setText('#bankMsg',active?'Activation de la sélection…':'Désactivation de la sélection…');
+  try{
+    for(const q of selected){
+      await rpc('reactivation_teacher_set_question_active',{
+        p_token:token,
+        p_track:q.track,
+        p_question_id:q.id,
+        p_active:active
+      });
+    }
+    setText('#bankMsg',selected.length+' question(s) '+(active?'activée(s).':'désactivée(s).'));
+    selectedIds.clear();
+    await loadBank();
+  }catch(err){
+    setText('#bankMsg','Modification impossible : '+err.message);
+    updateSelectionCount();
+  }
 }
 
 async function createRandomSession(){
@@ -510,6 +539,8 @@ function bind(){
   $('#bankTrack').addEventListener('change',()=>{if($('#bankTheme'))$('#bankTheme').value='';loadBank()});
   $('#bankTheme').addEventListener('change',()=>{selectedIds.clear();updateSelectionCount();renderBank(currentBankRows)});
   $('#selectRandomTheme').addEventListener('click',selectRandomFromTheme);
+  $('#activateSelection').addEventListener('click',()=>setSelectedActive(true));
+  $('#deactivateSelection').addEventListener('click',()=>setSelectedActive(false));
   $('#createFromSelection').addEventListener('click',createSelectedSession);
   $('#createRandom').addEventListener('click',createRandomSession);
   $('#startReflection').addEventListener('click',()=>setPhase('reflection'));
