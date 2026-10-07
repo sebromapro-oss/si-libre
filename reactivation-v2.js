@@ -9,6 +9,7 @@ const labels={TSMA:'BTS TSMA',MMCM:'BTS MMCM',BAC_PRO:'Bac Pro Maintenance',CAP:
 let token=sessionStorage.getItem('si_reactivation_teacher_token')||'';
 let currentSession=null;
 let selectedIds=new Set();
+let currentBankRows=[];
 let importedRows=[];
 let timerId=null;
 let accessMode='register';
@@ -118,42 +119,83 @@ async function loadBank(){
     const rows=await rpc('reactivation_teacher_list_questions',{
       p_token:token,p_track:track,p_active_only:false,p_limit:500
     });
-    renderBank(Array.isArray(rows)?rows:[]);
+    currentBankRows=Array.isArray(rows)?rows:[];
+    populateThemeFilter(currentBankRows);
+    renderBank(currentBankRows);
   }catch(err){
     $('#questionBank').innerHTML='<p class="msg">Impossible de charger la banque : '+esc(err.message)+'</p>';
   }
 }
 
+function themeOf(q){
+  return String(q?.theme||q?.sequence||'Sans thème').trim()||'Sans thème';
+}
+
+function populateThemeFilter(rows){
+  const select=$('#bankTheme');
+  if(!select)return;
+  const previous=select.value;
+  const themes=[...new Set(rows.map(themeOf))].sort((a,b)=>a.localeCompare(b,'fr',{numeric:true,sensitivity:'base'}));
+  select.innerHTML='<option value="">Tous les thèmes</option>'+themes.map(theme=>`<option value="${esc(theme)}">${esc(theme)}</option>`).join('');
+  if(themes.includes(previous))select.value=previous;
+}
+
+function visibleBankRows(){
+  const theme=$('#bankTheme')?.value||'';
+  return theme?currentBankRows.filter(q=>themeOf(q)===theme):currentBankRows;
+}
+
 function renderBank(rows){
-  if(!rows.length){
-    $('#questionBank').innerHTML='<p class="micro">Aucune réactivation pour ce parcours.</p>';
+  const filtered=($('#bankTheme')?.value||'')?visibleBankRows():rows;
+  if(!filtered.length){
+    $('#questionBank').innerHTML='<p class="micro">Aucune réactivation pour ce thème.</p>';
     return;
   }
 
-  $('#questionBank').innerHTML=rows.map(q=>`
-    <article class="bank-row" data-id="${esc(q.id)}" data-track="${esc(q.track)}">
-      <div class="bank-main">
-        <div class="bank-meta">
-          <span class="tag soft">${esc(q.sequence||'Sans séquence')}</span>
-          <span class="tag soft">${esc(q.notion||'Sans notion')}</span>
-          <span class="tag soft">${esc(q.difficulty||'')}</span>
-        </div>
-        <strong>${esc(q.question)}</strong>
-        <small>Réponse : ${esc(q.answer)}</small>
-      </div>
-      <div class="bank-actions">
-        <button class="btn ${q.active?'success':'ghost'} toggle-question" data-active="${q.active}" type="button">
-          ${q.active?'Active':'Inactive'}
-        </button>
-        <label class="select-question">
-          <input class="question-check" type="checkbox" ${q.active?'':'disabled'}>
-          Sélectionner
-        </label>
-      </div>
-    </article>
-  `).join('');
+  const groups=new Map();
+  filtered.forEach(q=>{
+    const theme=themeOf(q);
+    if(!groups.has(theme))groups.set(theme,[]);
+    groups.get(theme).push(q);
+  });
 
-  $$('.toggle-question').forEach(btn=>btn.addEventListener('click',async()=>{
+  $('#questionBank').innerHTML=[...groups.entries()].map(([theme,questions])=>{
+    const activeCount=questions.filter(q=>q.active).length;
+    return `
+      <details class="theme-group" open>
+        <summary>
+          <span><strong>${esc(theme)}</strong><small>${questions.length} question(s) · ${activeCount} active(s)</small></span>
+          <span class="tag soft">Thème</span>
+        </summary>
+        <div class="theme-question-list">
+          ${questions.map(q=>`
+            <article class="bank-row" data-id="${esc(q.id)}" data-track="${esc(q.track)}">
+              <div class="bank-main">
+                <div class="bank-meta">
+                  <span class="tag soft">${esc(q.sequence||'Sans séquence')}</span>
+                  <span class="tag soft">${esc(q.notion||'Sans notion')}</span>
+                  <span class="tag soft">${esc(q.difficulty||'')}</span>
+                </div>
+                <strong>${esc(q.question)}</strong>
+                <small>Réponse : ${esc(q.answer)}</small>
+              </div>
+              <div class="bank-actions">
+                <button class="btn ${q.active?'success':'ghost'} toggle-question" data-active="${q.active}" type="button">
+                  ${q.active?'Active':'Inactive'}
+                </button>
+                <label class="select-question">
+                  <input class="question-check" type="checkbox" ${q.active?'':'disabled'} ${selectedIds.has(String(q.id))?'checked':''}>
+                  Sélectionner
+                </label>
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      </details>
+    `;
+  }).join('');
+
+  $('.toggle-question').forEach(btn=>btn.addEventListener('click',async()=>{
     const row=btn.closest('.bank-row');
     const next=btn.dataset.active!=='true';
     btn.disabled=true;
@@ -172,8 +214,8 @@ function renderBank(rows){
     }
   }));
 
-  $$('.question-check').forEach(check=>check.addEventListener('change',()=>{
-    const id=check.closest('.bank-row').dataset.id;
+  $('.question-check').forEach(check=>check.addEventListener('change',()=>{
+    const id=String(check.closest('.bank-row').dataset.id);
     if(check.checked){
       if(selectedIds.size>=4){
         check.checked=false;
@@ -186,6 +228,19 @@ function renderBank(rows){
     }
     updateSelectionCount();
   }));
+}
+
+function selectRandomFromTheme(){
+  const rows=visibleBankRows().filter(q=>q.active);
+  if(rows.length<4){
+    setText('#bankMsg','Ce thème contient moins de 4 questions actives.');
+    return;
+  }
+  const shuffled=[...rows].sort(()=>Math.random()-.5).slice(0,4);
+  selectedIds=new Set(shuffled.map(q=>String(q.id)));
+  setText('#bankMsg','4 questions choisies dans le thème '+($('#bankTheme').value||'affiché')+'.');
+  renderBank(currentBankRows);
+  updateSelectionCount();
 }
 
 function updateSelectionCount(){
@@ -388,7 +443,7 @@ async function previewImport(file){
     const valid=importedRows.filter(r=>r.track&&r.question&&r.answer);
     setText('#importSummary',importedRows.length+' ligne(s) lue(s) · '+valid.length+' valide(s).');
     $('#importPreviewBody').innerHTML=importedRows.slice(0,12).map(r=>`
-      <tr><td>${esc(r.track)}</td><td>${esc(r.sequence)}</td><td>${esc(r.notion)}</td><td>${esc(r.question)}</td><td>${esc(r.answer)}</td></tr>
+      <tr><td>${esc(r.track)}</td><td>${esc(r.theme||'Sans thème')}</td><td>${esc(r.sequence)}</td><td>${esc(r.notion)}</td><td>${esc(r.question)}</td><td>${esc(r.answer)}</td></tr>
     `).join('');
     show($('#importPreview'));
   }catch(err){
@@ -452,7 +507,9 @@ function bind(){
     token='';sessionStorage.removeItem('si_reactivation_teacher_token');location.reload();
   });
 
-  $('#bankTrack').addEventListener('change',loadBank);
+  $('#bankTrack').addEventListener('change',()=>{if($('#bankTheme'))$('#bankTheme').value='';loadBank()});
+  $('#bankTheme').addEventListener('change',()=>{selectedIds.clear();updateSelectionCount();renderBank(currentBankRows)});
+  $('#selectRandomTheme').addEventListener('click',selectRandomFromTheme);
   $('#createFromSelection').addEventListener('click',createSelectedSession);
   $('#createRandom').addEventListener('click',createRandomSession);
   $('#startReflection').addEventListener('click',()=>setPhase('reflection'));
