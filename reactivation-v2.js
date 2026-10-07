@@ -121,6 +121,7 @@ async function loadBank(){
     });
     currentBankRows=Array.isArray(rows)?rows:[];
     populateThemeFilter(currentBankRows);
+    populateDocumentFilter(currentBankRows);
     renderBank(currentBankRows);
   }catch(err){
     $('#questionBank').innerHTML='<p class="msg">Impossible de charger la banque : '+esc(err.message)+'</p>';
@@ -129,6 +130,10 @@ async function loadBank(){
 
 function themeOf(q){
   return String(q?.theme||q?.sequence||'Sans thème').trim()||'Sans thème';
+}
+
+function documentOf(q){
+  return String(q?.source||q?.origin||'Document non renseigné').trim()||'Document non renseigné';
 }
 
 function populateThemeFilter(rows){
@@ -140,63 +145,87 @@ function populateThemeFilter(rows){
   if(themes.includes(previous))select.value=previous;
 }
 
+function populateDocumentFilter(rows){
+  const select=$('#bankDocument');
+  if(!select)return;
+  const previous=select.value;
+  const docs=[...new Set(rows.map(documentOf))].sort((a,b)=>a.localeCompare(b,'fr',{numeric:true,sensitivity:'base'}));
+  select.innerHTML='<option value="">Tous les documents</option>'+docs.map(doc=>`<option value="${esc(doc)}">${esc(doc)}</option>`).join('');
+  if(docs.includes(previous))select.value=previous;
+}
+
 function visibleBankRows(){
   const theme=$('#bankTheme')?.value||'';
-  return theme?currentBankRows.filter(q=>themeOf(q)===theme):currentBankRows;
+  const documentName=$('#bankDocument')?.value||'';
+  return currentBankRows.filter(q=>(!theme||themeOf(q)===theme)&&(!documentName||documentOf(q)===documentName));
 }
 
 function renderBank(rows){
-  const filtered=($('#bankTheme')?.value||'')?visibleBankRows():rows;
+  const filtered=visibleBankRows();
   if(!filtered.length){
-    $('#questionBank').innerHTML='<p class="micro">Aucune réactivation pour ce thème.</p>';
+    $('#questionBank').innerHTML='<p class="micro">Aucune réactivation pour ces filtres.</p>';
     return;
   }
 
-  const groups=new Map();
+  const themeGroups=new Map();
   filtered.forEach(q=>{
     const theme=themeOf(q);
-    if(!groups.has(theme))groups.set(theme,[]);
-    groups.get(theme).push(q);
+    if(!themeGroups.has(theme))themeGroups.set(theme,new Map());
+    const doc=documentOf(q);
+    const docMap=themeGroups.get(theme);
+    if(!docMap.has(doc))docMap.set(doc,[]);
+    docMap.get(doc).push(q);
   });
 
-  $('#questionBank').innerHTML=[...groups.entries()].map(([theme,questions])=>{
-    const activeCount=questions.filter(q=>q.active).length;
+  $('#questionBank').innerHTML=[...themeGroups.entries()].map(([theme,docMap])=>{
+    const themeQuestions=[...docMap.values()].flat();
+    const activeCount=themeQuestions.filter(q=>q.active).length;
     return `
       <details class="theme-group" open>
         <summary>
-          <span><strong>${esc(theme)}</strong><small>${questions.length} question(s) · ${activeCount} active(s)</small></span>
+          <span><strong>${esc(theme)}</strong><small>${themeQuestions.length} question(s) · ${activeCount} active(s) · ${docMap.size} document(s)</small></span>
           <span class="tag soft">Thème</span>
         </summary>
-        <div class="theme-question-list">
-          ${questions.map(q=>`
-            <article class="bank-row ${q.active?'is-active':'is-inactive'} ${selectedIds.has(String(q.id))?'is-selected':''}" data-id="${esc(q.id)}" data-track="${esc(q.track)}">
-              <div class="bank-main">
-                <div class="bank-meta">
-                  <span class="status-chip ${q.active?'active':'inactive'}">${q.active?'● ACTIVE':'○ INACTIVE'}</span>
-                  <span class="tag soft">${esc(q.sequence||'Sans séquence')}</span>
-                  <span class="tag soft">${esc(q.notion||'Sans notion')}</span>
-                  <span class="tag soft">${esc(q.difficulty||'')}</span>
-                </div>
-                <strong>${esc(q.question)}</strong>
-                <small>Réponse : ${esc(q.answer)}</small>
+        <div class="document-groups">
+          ${[...docMap.entries()].map(([doc,questions])=>`
+            <details class="document-group" open>
+              <summary>
+                <span><strong>${esc(doc)}</strong><small>${questions.length} question(s) · ${questions.filter(q=>q.active).length} active(s)</small></span>
+                <span class="tag soft">Document</span>
+              </summary>
+              <div class="theme-question-list">
+                ${questions.map(q=>`
+                  <article class="bank-row ${q.active?'is-active':'is-inactive'} ${selectedIds.has(String(q.id))?'is-selected':''}" data-id="${esc(q.id)}" data-track="${esc(q.track)}">
+                    <div class="bank-main">
+                      <div class="bank-meta">
+                        <span class="status-chip ${q.active?'active':'inactive'}">${q.active?'● ACTIVE':'○ INACTIVE'}</span>
+                        <span class="tag soft">${esc(q.sequence||'Sans séquence')}</span>
+                        <span class="tag soft">${esc(q.notion||'Sans notion')}</span>
+                        <span class="tag soft">${esc(q.difficulty||'')}</span>
+                      </div>
+                      <strong>${esc(q.question)}</strong>
+                      <small>Réponse : ${esc(q.answer)}</small>
+                    </div>
+                    <div class="bank-actions">
+                      <button class="btn ${q.active?'success':'ghost'} toggle-question" data-active="${q.active}" type="button">
+                        ${q.active?'Active':'Inactive'}
+                      </button>
+                      <label class="select-question">
+                        <input class="question-check" type="checkbox" ${selectedIds.has(String(q.id))?'checked':''}>
+                        Sélectionner
+                      </label>
+                    </div>
+                  </article>
+                `).join('')}
               </div>
-              <div class="bank-actions">
-                <button class="btn ${q.active?'success':'ghost'} toggle-question" data-active="${q.active}" type="button">
-                  ${q.active?'Active':'Inactive'}
-                </button>
-                <label class="select-question">
-                  <input class="question-check" type="checkbox" ${selectedIds.has(String(q.id))?'checked':''}>
-                  Sélectionner
-                </label>
-              </div>
-            </article>
+            </details>
           `).join('')}
         </div>
       </details>
     `;
   }).join('');
 
-  $('.toggle-question').forEach(btn=>btn.addEventListener('click',async()=>{
+  $$('.toggle-question').forEach(btn=>btn.addEventListener('click',async()=>{
     const row=btn.closest('.bank-row');
     const next=btn.dataset.active!=='true';
     btn.disabled=true;
@@ -215,7 +244,7 @@ function renderBank(rows){
     }
   }));
 
-  $('.question-check').forEach(check=>check.addEventListener('change',()=>{
+  $$('.question-check').forEach(check=>check.addEventListener('change',()=>{
     const id=String(check.closest('.bank-row').dataset.id);
     if(check.checked){
       if(selectedIds.size>=4){
@@ -538,8 +567,9 @@ function bind(){
     token='';sessionStorage.removeItem('si_reactivation_teacher_token');location.reload();
   });
 
-  $('#bankTrack').addEventListener('change',()=>{if($('#bankTheme'))$('#bankTheme').value='';loadBank()});
+  $('#bankTrack').addEventListener('change',()=>{if($('#bankTheme'))$('#bankTheme').value='';if($('#bankDocument'))$('#bankDocument').value='';loadBank()});
   $('#bankTheme').addEventListener('change',()=>{selectedIds.clear();updateSelectionCount();renderBank(currentBankRows)});
+  $('#bankDocument').addEventListener('change',()=>{selectedIds.clear();updateSelectionCount();renderBank(currentBankRows)});
   $('#selectRandomTheme').addEventListener('click',selectRandomFromTheme);
   $('#activateSelection').addEventListener('click',()=>setSelectedActive(true));
   $('#deactivateSelection').addEventListener('click',()=>setSelectedActive(false));
