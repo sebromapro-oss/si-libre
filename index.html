@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f4c81">
   <meta name="description" content="Réactivation mémoire en Sciences Industrielles">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?rev=8">
+  <link rel="stylesheet" href="styles.css?rev=9">
   <title>SI Réactivation</title>
 </head>
 <body>
@@ -128,6 +128,8 @@
         </div>
         <div class="selection-actions">
           <button id="selectRandomTheme" class="btn ghost" type="button">Choisir 4 au hasard dans le thème</button>
+          <button id="activateSelection" class="btn success" type="button" disabled>Activer la sélection</button>
+          <button id="deactivateSelection" class="btn warn" type="button" disabled>Désactiver la sélection</button>
           <button id="createFromSelection" class="btn primary" type="button" disabled>Créer une séance avec ces 4 questions</button>
         </div>
       </div>
@@ -201,6 +203,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="reactivation-v2.js?rev=8" defer></script>
+<script src="reactivation-v2.js?rev=9" defer></script>
 </body>
 </html>
