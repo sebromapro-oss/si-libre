@@ -87,3 +87,12 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:10px;backgro
 .status-chip.active{background:#e2f2e8;color:#185a38;border:1px solid #a9d2b8}
 .status-chip.inactive{background:#eef1f4;color:#596774;border:1px solid #cfd7de}
 #bankMsg:not(:empty){padding:10px 12px;border-radius:10px;background:#eef7f2;color:#185a38;border:1px solid #c6dfcf}
+
+.document-groups{display:grid;gap:10px;padding:0 12px 12px}
+.document-group{border:1px solid #dfe6ec;border-radius:13px;background:#fff;overflow:hidden}
+.document-group>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;list-style:none;background:#f7f9fb}
+.document-group>summary::-webkit-details-marker{display:none}
+.document-group>summary span:first-child{display:grid;gap:2px;min-width:0}
+.document-group>summary strong{overflow-wrap:anywhere}
+.document-group>summary small{color:var(--muted);font-weight:500}
+.document-group .theme-question-list{padding:10px}
