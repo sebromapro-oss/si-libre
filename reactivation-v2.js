@@ -12,7 +12,7 @@ let selectedIds=new Set();
 let currentBankRows=[];
 let importedRows=[];
 let timerId=null;
-let accessMode='register';
+let accessMode='login';
 
 function show(el){if(el)el.classList.remove('hidden')}
 function hide(el){if(el)el.classList.add('hidden')}
@@ -593,7 +593,7 @@ async function init(){
   }
 
   hide($('#archiveView'));hide($('#teacherView'));hide($('#logoutBtn'));show($('#authView'));
-  setAccessMode('register');
+  setAccessMode('login');
 
   if(token){
     const ok=await openTeacher();
