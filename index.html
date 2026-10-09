@@ -28,8 +28,8 @@
     <p class="lead">Crée ton accès professeur ou connecte-toi.</p>
 
     <div class="mode-tabs">
-      <button id="showCreateBtn" class="mode-btn active" type="button">Créer mon accès professeur</button>
-      <button id="showLoginBtn" class="mode-btn" type="button">J’ai déjà un accès</button>
+      <button id="showCreateBtn" class="mode-btn" type="button">Créer mon accès professeur</button>
+      <button id="showLoginBtn" class="mode-btn active" type="button">J’ai déjà un accès</button>
     </div>
 
     <form id="authForm" class="form">
@@ -37,16 +37,16 @@
         <input id="loginId" type="text" autocomplete="username" required>
       </label>
       <label>Mot de passe
-        <input id="loginPassword" type="password" autocomplete="new-password" required>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
       </label>
-      <label id="confirmWrap">Confirmer le mot de passe
-        <input id="loginPasswordConfirm" type="password" autocomplete="new-password" required>
+      <label id="confirmWrap" class="hidden">Confirmer le mot de passe
+        <input id="loginPasswordConfirm" type="password" autocomplete="new-password">
       </label>
-      <button id="loginSubmitBtn" class="btn primary" type="submit">Créer mon accès professeur</button>
+      <button id="loginSubmitBtn" class="btn primary" type="submit">Connexion</button>
     </form>
 
     <p id="loginMsg" class="msg" role="status"></p>
-    <p id="loginHelp" class="micro">Premier accès : choisis ton identifiant et ton mot de passe.</p>
+    <p id="loginHelp" class="micro">Connecte-toi avec ton identifiant et ton mot de passe.</p>
   </section>
 
   <section id="teacherView" class="hidden">
@@ -208,6 +208,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="reactivation-v2.js?rev=12" defer></script>
+<script src="reactivation-v2.js?rev=13" defer></script>
 </body>
 </html>
