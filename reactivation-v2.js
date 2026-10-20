@@ -4,7 +4,7 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const $=(s)=>document.querySelector(s);
 const $$=(s)=>[...document.querySelectorAll(s)];
-const labels={TSMA:'BTS TSMA',MMCM:'BTS MMCM',BAC_PRO:'Bac Pro Maintenance',CAP:'CAP Maintenance'};
+const labels={TSMA:'BTS TSMA',MMCM:'BTS MMCM',BAC_PRO:'Bac Pro Maintenance',};
 
 let token=sessionStorage.getItem('si_reactivation_teacher_token')||'';
 let currentSession=null;
@@ -103,7 +103,6 @@ function renderStats(data){
     ['BTS TSMA',counts.TSMA||0],
     ['BTS MMCM',counts.MMCM||0],
     ['Bac Pro',counts.BAC_PRO||0],
-    ['CAP',counts.CAP||0],
     ['Séances',data?.sessions||0]
   ].map(([label,value])=>`<div class="stat"><span>${esc(label)}</span><strong>${value}</strong></div>`).join('');
 }
@@ -316,7 +315,7 @@ async function createRandomSession(){
       p_track:$('#sessionTrack').value,
       p_title:$('#sessionTitle').value.trim()||'Réactivation du jour'
     });
-    setText('#sessionMsg','Séance créée.');
+    setText('#sessionMsg','Séance créée : vérifie les 4 questions avant de démarrer.');
     renderSession();
     await loadLibrary();
   }catch(err){
@@ -326,6 +325,7 @@ async function createRandomSession(){
 
 async function createSelectedSession(){
   if(selectedIds.size!==4)return;
+  $('#sessionTrack').value=$('#bankTrack').value;
   setText('#bankMsg','Création de la séance…');
   try{
     currentSession=await rpc('reactivation_teacher_create_session_from_questions',{
@@ -336,7 +336,7 @@ async function createSelectedSession(){
     });
     selectedIds.clear();
     updateSelectionCount();
-    setText('#bankMsg','Séance créée avec les 4 questions sélectionnées.');
+    setText('#bankMsg','Séance créée avec les 4 questions sélectionnées. Vérifie la prévisualisation puis démarre la réflexion.');
     renderSession();
     await loadLibrary();
     window.scrollTo({top:$('#sessionPanel').offsetTop-80,behavior:'smooth'});
@@ -367,6 +367,11 @@ function renderSession(){
   setText('#sessionMeta',(labels[currentSession.track]||currentSession.track)+' · '+dateFr(currentSession.session_date||currentSession.created_at));
 
   const reveal=['correction','closed'].includes(currentSession.status);
+  const closed=currentSession.status==='closed';
+  setText('#studentVisibility',closed?'✓ Publiée dans les archives étudiantes du parcours '+(labels[currentSession.track]||currentSession.track):'Non publiée dans les archives étudiantes : clore la séance après correction.');
+  const archiveLink=$('#studentArchiveLink');
+  archiveLink.href='https://sebromapro-oss.github.io/si-libre/?mode=archive&track='+encodeURIComponent(currentSession.track);
+  archiveLink.classList.toggle('hidden',!closed);
   $('#sessionQuestions').innerHTML=(currentSession.questions||[]).map((q,i)=>`
     <article class="question-card-mini">
       <div class="question-meta"><span class="tag">Q${i+1}</span><span class="tag soft">${esc(q.sequence||'')}</span><span class="tag soft">${esc(q.notion||'')}</span></div>
@@ -587,7 +592,7 @@ async function init(){
   bind();
   const params=new URLSearchParams(location.search);
   const track=(params.get('track')||'').toUpperCase();
-  if(params.get('mode')==='archive'&&['TSMA','MMCM','BAC_PRO','CAP'].includes(track)){
+  if(params.get('mode')==='archive'&&['TSMA','MMCM','BAC_PRO'].includes(track)){
     await loadArchive(track);
     return;
   }
