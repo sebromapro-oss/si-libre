@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SI LAB | Roue et pression sur les sols</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#17283d;background:#f3f6fa}*{box-sizing:border-box}
+body{margin:0;line-height:1.55}header{background:#12375a;color:white;padding:22px max(18px,calc((100vw - 1100px)/2))}header p{margin:.25rem 0;color:#e1ebfa}
+main{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px}
+.panel{background:white;padding:22px;border:1px solid #d5e0ed;border-radius:16px;box-shadow:0 3px 12px #142b4010}.wide{grid-column:1/-1}
+h1{font-size:1.5rem;margin:0}h2{font-size:1.16rem;margin:0 0 12px}h3{font-size:1rem}
+label{display:block;font-weight:700;margin:13px 0 4px}select,input[type=range],button{width:100%;font:inherit}input[type=range]{accent-color:#176ab0}select,button{min-height:44px;border:1px solid #9babc0;border-radius:9px;padding:8px;background:white;color:#162b41}
+button{background:#124879;color:white;border:0;font-weight:700;cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ff9c32;outline-offset:3px}
+.val{float:right;color:#135d99;font-variant-numeric:tabular-nums}.note{font-size:.9rem;color:#40536c}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metric{background:#eef5fb;border-radius:12px;padding:14px}.metric strong{font-size:1.65rem;display:block;font-variant-numeric:tabular-nums}
+svg{display:block;width:100%;height:auto}#plot{background:#fff;border:1px solid #d9e3ed;border-radius:12px}.warn{border-left:5px solid #c87024;padding:10px 15px;background:#fff5e8}.good{border-left:5px solid #247b52;padding:10px 15px;background:#e9f7ee}
+small{color:#45556b}details{margin-top:14px}summary{cursor:pointer;font-weight:700}
+@media(max-width:760px){main{display:block;padding:12px}.panel{margin-bottom:12px;padding:16px}.metrics{grid-template-columns:1fr 1fr}h1{font-size:1.3rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<header><h1>SI LAB · Effort à la roue et pression sur les sols</h1><p>Laboratoire numérique libre · Investigation mécanique · Version pédagogique 1.0</p></header>
+<main>
+<section class="panel" aria-label="Paramètres"><h2>1 · Paramètres</h2>
+<label for="sol">Texture du sol</label><select id="sol"><option value="limon">Limoneux</option><option value="sable">Sableux</option><option value="argile">Argileux</option></select>
+<p class="note">La texture ne détermine pas à elle seule la résistance. Humidité, densité et structure doivent aussi être étudiées.</p>
+<label for="force">Effort vertical par roue <span class="val" id="fv"></span></label><input id="force" type="range" min="5" max="80" value="25" step="1">
+<label for="surface">Surface réelle de contact <span class="val" id="sv"></span></label><input id="surface" type="range" min="0.05" max="1" value="0.25" step="0.01">
+<label for="seuil">Seuil de résistance hypothétique <span class="val" id="rv"></span></label><input id="seuil" type="range" min="50" max="500" value="150" step="10">
+<p class="note">Le seuil est une donnée d'exercice, non une mesure du sol ni une limite réglementaire.</p>
+<button type="button" id="reset">Réinitialiser</button>
+</section>
+<section class="panel"><h2>2 · Résultats instantanés</h2>
+<div class="metrics"><div class="metric">Pression moyenne<strong id="pv" aria-live="polite"></strong><small>p = F / S</small></div>
+<div class="metric">Rapport au seuil<strong id="kv"></strong><small>p / résistance choisie</small></div></div>
+<p id="interpretation" role="status"></p>
+<h3>Effet de la surface d'appui</h3>
+<svg id="plot" viewBox="0 0 650 345" role="img" aria-labelledby="graphtitle graphdesc"><title id="graphtitle">Pression en fonction de la surface de contact</title><desc id="graphdesc">Courbe inverse : à effort égal, la pression baisse quand la surface augmente. La droite horizontale marque le seuil hypothétique.</desc></svg>
+<p class="note">Axe horizontal : surface (m²). Axe vertical : pression moyenne (kPa). Le point représente le réglage courant. Le modèle suppose un effort constant et une pression uniformément répartie sur l'empreinte.</p>
+</section>
+<section class="panel wide"><h2>3 · Méthode et décision professionnelle</h2>
+<p><strong>Question flash :</strong> convertir 25 kN en newtons, rappeler la relation entre pression, force et surface, puis convertir 100 000 Pa en kPa.</p>
+<p><strong>Investigation :</strong> garder 25 kN par roue ; tester des surfaces de 0,15 m², 0,25 m² et 0,50 m². Relever les pressions, comparer les résultats et formuler une décision argumentée.</p>
+<p><strong>Attention scientifique :</strong> cette simulation calcule la pression moyenne à l'interface roue–sol. Elle ne prédit ni la profondeur de tassement, ni les ornières, ni les déformations irréversibles. Pour cela, il faut des paramètres géotechniques mesurés et un modèle de propagation des contraintes et de comportement du sol validé.</p>
+<details><summary>Voir l'équation et le contrôle des unités</summary><p>F en kN ; S en m² ; p = F / S en kPa, car 1 kN/m² = 1 kPa.</p></details>
+<p class="note">Accessibilité : commandes utilisables au clavier, textes lisibles sur smartphone et absence d'animations imposées. Les essais réels TalkBack et WCAG restent à réaliser.</p>
+</section></main>
+<script>
+const $=id=>document.getElementById(id), force=$('force'),surface=$('surface'),seuil=$('seuil'),svg=$('plot');
+const fr=(v,n=1)=>Number(v).toLocaleString('fr-FR',{maximumFractionDigits:n});
+function draw(){
+const F=Number(force.value),S=Number(surface.value),R=Number(seuil.value),P=F/S,K=P/R;
+$('fv').textContent=fr(F,0)+' kN';$('sv').textContent=fr(S,2)+' m²';$('rv').textContent=fr(R,0)+' kPa';$('pv').textContent=fr(P)+' kPa';$('kv').textContent=fr(K,2)+' ×';
+const msg=K>1?'La pression dépasse le seuil hypothétique choisi. Étudier le risque avec des données de sol mesurées.':'La pression ne dépasse pas le seuil hypothétique choisi. Cela ne garantit pas l’absence de tassement en profondeur.';
+$('interpretation').className=K>1?'warn':'good';$('interpretation').textContent=msg;
+const L=66,T=16,W=552,H=266, maxP=Math.max(550,Math.ceil(F/.05/100)*100,R+50), x=s=>L+(s-.05)/.95*W,y=p=>T+H-(p/maxP)*H;
+let h='';
+for(let i=0;i<=5;i++){const yy=T+H-H*i/5,p=maxP*i/5;h+='<line x1="'+L+'" x2="'+(L+W)+'" y1="'+yy+'" y2="'+yy+'" stroke="#e1e8f0"/><text x="60" y="'+(yy+4)+'" text-anchor="end" font-size="12" fill="#263b54">'+fr(p,0)+'</text>'}
+for(let i=0;i<=5;i++){let ss=.05+.95*i/5,xx=x(ss);h+='<text x="'+xx+'" y="305" text-anchor="middle" font-size="12" fill="#263b54">'+fr(ss,2)+'</text>'}
+let pts=[];for(let i=0;i<=120;i++){let s=.05+.95*i/120;pts.push(x(s).toFixed(1)+','+y(F/s).toFixed(1))}
+h+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#1266aa" stroke-width="4"/>';
+h+='<line x1="'+L+'" x2="'+(L+W)+'" y1="'+y(R)+'" y2="'+y(R)+'" stroke="#bd671b" stroke-width="3" stroke-dasharray="8 6"/>';
+h+='<circle cx="'+x(S)+'" cy="'+y(P)+'" r="7" fill="#102d50" stroke="white" stroke-width="2"/>';
+h+='<text x="330" y="335" text-anchor="middle" font-size="13" fill="#263b54">Surface de contact (m²)</text><text x="8" y="16" font-size="12" fill="#263b54">kPa</text>';
+svg.innerHTML='<title id="graphtitle">Pression en fonction de la surface de contact</title><desc id="graphdesc">Effort '+fr(F,0)+' kN, surface '+fr(S,2)+' m², pression '+fr(P)+' kPa et seuil '+fr(R,0)+' kPa.</desc>'+h;
+}
+[force,surface,seuil,$('sol')].forEach(el=>el.addEventListener('input',draw));
+$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('sol').value='limon';draw()});draw();
+</script></body></html>
