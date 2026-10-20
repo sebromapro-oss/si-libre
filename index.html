@@ -59,6 +59,7 @@
     </section>
 
     <div id="teacherStats" class="stats"></div>
+    <section class="panel" aria-label="Guide de publication"><h2>Une séance en 3 étapes</h2><p class="lead">1. Choisir les 4 questions dans la banque · 2. Créer et prévisualiser la séance · 3. Démarrer, corriger puis clore pour afficher la séance dans les archives étudiantes.</p><p class="micro">Les réponses restent masquées pendant la réflexion. Une séance n’apparaît dans les archives étudiantes qu’après sa clôture.</p></section>
 
     <section class="panel">
       <p class="eyebrow">NOUVELLE SÉANCE</p>
@@ -69,7 +70,6 @@
             <option value="TSMA">BTS TSMA</option>
             <option value="MMCM">BTS MMCM</option>
             <option value="BAC_PRO">Bac Pro Maintenance</option>
-            <option value="CAP">CAP Maintenance</option>
           </select>
         </label>
         <label>Titre
@@ -85,7 +85,7 @@
         <div>
           <p id="sessionPhase" class="eyebrow"></p>
           <h2 id="sessionName"></h2>
-          <p id="sessionMeta" class="micro"></p>
+          <p id="sessionMeta" class="micro"></p><p id="studentVisibility" class="micro" role="status"></p><a id="studentArchiveLink" class="btn ghost hidden" target="_blank" rel="noopener noreferrer">Voir la séance dans les archives étudiantes ↗</a>
         </div>
         <div class="timer-box"><strong id="sessionTimer"></strong></div>
       </div>
@@ -102,7 +102,7 @@
         <div>
           <p class="eyebrow">BANQUE</p>
           <h2>Réactivations mémoire disponibles</h2>
-          <p class="micro">Active/désactive les questions, puis sélectionne exactement 4 questions.</p>
+          <p class="micro">Filtre par parcours et thème, coche exactement 4 questions, puis clique sur « Créer une séance ». Les boutons activer/désactiver servent uniquement à gérer la banque.</p>
         </div>
         <div class="bank-filters">
           <label>Parcours
@@ -110,8 +110,7 @@
               <option value="TSMA">BTS TSMA</option>
               <option value="MMCM">BTS MMCM</option>
               <option value="BAC_PRO">Bac Pro Maintenance</option>
-              <option value="CAP">CAP Maintenance</option>
-            </select>
+              </select>
           </label>
           <label>Thème
             <select id="bankTheme">
@@ -132,10 +131,10 @@
           <p id="themeHelp" class="micro">Les questions sont regroupées par thème puis par document source. Tu peux filtrer un thème, un document déposé ou sélectionner 4 questions librement.</p>
         </div>
         <div class="selection-actions">
-          <button id="selectRandomTheme" class="btn ghost" type="button">Choisir 4 au hasard dans le thème</button>
+          <button id="selectRandomTheme" class="btn ghost" type="button">Proposer 4 questions du filtre</button>
           <button id="activateSelection" class="btn success" type="button" disabled>Activer la sélection</button>
           <button id="deactivateSelection" class="btn warn" type="button" disabled>Désactiver la sélection</button>
-          <button id="createFromSelection" class="btn primary" type="button" disabled>Créer une séance avec ces 4 questions</button>
+          <button id="createFromSelection" class="btn primary" type="button" disabled>Créer et prévisualiser ces 4 questions</button>
         </div>
       </div>
 
@@ -156,7 +155,6 @@
             <option value="TSMA">BTS TSMA</option>
             <option value="MMCM">BTS MMCM</option>
             <option value="BAC_PRO">Bac Pro Maintenance</option>
-            <option value="CAP">CAP Maintenance</option>
           </select>
         </label>
       </div>
@@ -208,6 +206,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="reactivation-v2.js?rev=13" defer></script>
+<script src="reactivation-v2.js?rev=14" defer></script>
 </body>
 </html>
