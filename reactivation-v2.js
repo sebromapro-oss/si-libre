@@ -156,7 +156,8 @@ function populateDocumentFilter(rows){
 function visibleBankRows(){
   const theme=$('#bankTheme')?.value||'';
   const documentName=$('#bankDocument')?.value||'';
-  return currentBankRows.filter(q=>(!theme||themeOf(q)===theme)&&(!documentName||documentOf(q)===documentName));
+  const search=norm($('#bankSearch')?.value||'');
+  return currentBankRows.filter(q=>(!theme||themeOf(q)===theme)&&(!documentName||documentOf(q)===documentName)&&(!search||norm([q.question,q.answer,q.sequence,q.notion,themeOf(q),documentOf(q)].join(' ')).includes(search)));
 }
 
 function renderBank(rows){
@@ -266,7 +267,9 @@ function selectRandomFromTheme(){
     setText('#bankMsg','Ce thème contient moins de 4 questions actives.');
     return;
   }
-  const shuffled=[...rows].sort(()=>Math.random()-.5).slice(0,4);
+  const shuffled=[...rows];
+  for(let i=shuffled.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[k]]=[shuffled[k],shuffled[i]];}
+  shuffled.length=4;
   selectedIds=new Set(shuffled.map(q=>String(q.id)));
   setText('#bankMsg','4 questions choisies dans le thème '+($('#bankTheme').value||'affiché')+'.');
   renderBank(currentBankRows);
@@ -275,6 +278,8 @@ function selectRandomFromTheme(){
 
 function updateSelectionCount(){
   setText('#selectionCount',selectedIds.size+' / 4 sélectionnée(s)');
+  const picked=currentBankRows.filter(q=>selectedIds.has(String(q.id)));
+  setText('#selectionPreview',picked.length?picked.map((q,i)=>(i+1)+'. '+String(q.question||'').slice(0,110)).join(' · '):'Sélectionne quatre questions pour préparer la séance.');
   if($('#createFromSelection'))$('#createFromSelection').disabled=selectedIds.size!==4;
   if($('#activateSelection'))$('#activateSelection').disabled=selectedIds.size===0;
   if($('#deactivateSelection'))$('#deactivateSelection').disabled=selectedIds.size===0;
@@ -572,6 +577,7 @@ function bind(){
     token='';sessionStorage.removeItem('si_reactivation_teacher_token');location.reload();
   });
 
+  $('#bankSearch').addEventListener('input',()=>{renderBank(currentBankRows)});
   $('#bankTrack').addEventListener('change',()=>{if($('#bankTheme'))$('#bankTheme').value='';if($('#bankDocument'))$('#bankDocument').value='';loadBank()});
   $('#bankTheme').addEventListener('change',()=>{selectedIds.clear();updateSelectionCount();renderBank(currentBankRows)});
   $('#bankDocument').addEventListener('change',()=>{selectedIds.clear();updateSelectionCount();renderBank(currentBankRows)});
