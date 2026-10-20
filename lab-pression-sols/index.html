@@ -23,7 +23,13 @@ small{color:#45556b}details{margin-top:14px}summary{cursor:pointer;font-weight:7
 <div class="metric"><label for="compareB">Configuration B · surface <span id="compareBv"></span></label><input type="range" min="0.05" max="1" step="0.01" id="compareB" value="0.40"><strong id="compareBp"></strong><small id="compareBz"></small></div>
 </div><svg id="comparePlot" viewBox="0 0 650 350" role="img" aria-label="Deux profils de contrainte verticale avec la profondeur, comparateur A et B"></svg><p id="compareDecision" role="status" class="note"></p>
 <button type="button" id="useA">Appliquer A au simulateur</button><button type="button" id="useB" style="margin-top:8px">Appliquer B au simulateur</button>
-</section><section class="panel" aria-label="Paramètres"><h2>1 · Paramètres</h2>
+</section><section class="panel wide"><h2>Modèle pneu–sol · empreinte estimée</h2><p class="note">Mode de démonstration non calibré : pression moyenne de contact estimée par p_contact = p_gonflage + p_carcasse (terme mécanique équivalent hypothétique). Les dimensions contraignent la géométrie possible de l’empreinte. La rigidité de carcasse ne peut pas être déduite de la dimension nominale : l'étalonner avec des mesures constructeur.</p>
+<label for="tireMode">Mode de détermination de l'empreinte</label><select id="tireMode"><option value="estimated">Estimation pneumatique (pédagogique)</option><option value="measured">Surface mesurée, saisie directe</option></select>
+<label for="tireWidth">Largeur nominale du pneu <span id="tireWidthV" class="val"></span></label><input type="range" id="tireWidth" min="0.25" max="0.90" value="0.60" step="0.01">
+<label for="tireDiameter">Diamètre extérieur <span id="tireDiameterV" class="val"></span></label><input type="range" id="tireDiameter" min="0.75" max="2.25" value="1.70" step="0.05">
+<label for="inflation">Pression de gonflage <span id="inflationV" class="val"></span></label><input type="range" id="inflation" min="0.5" max="3" value="1.2" step="0.1">
+<label for="carcass">Contribution équivalente de la carcasse <span id="carcassV" class="val"></span></label><input type="range" id="carcass" min="0" max="100" value="20" step="5">
+<p id="tireResult" role="status"></p><p class="note">Largeur effective d'empreinte choisie ici égale à 85 % de la largeur nominale, hypothèse non universelle. Longueur d'empreinte = surface / largeur effective. La longueur est confrontée au diamètre ; si elle dépasse 60 % du diamètre, le scénario est déclaré hors domaine. Aucun tableau de charge/vitesse ou pneu réel n'est certifié.</p></section><section class="panel" aria-label="Paramètres"><h2>1 · Paramètres</h2>
 <label for="sol">Texture du sol</label><select id="sol"><option value="limon">Limoneux</option><option value="sable">Sableux</option><option value="argile">Argileux</option></select>
 <p class="note">La texture ne détermine pas à elle seule la résistance. Humidité, densité et structure doivent aussi être étudiées.</p>
 <label for="humidity">Humidité (scénario pédagogique)</label><select id="humidity"><option value="sec">Sec</option><option value="intermediaire" selected>Intermédiaire</option><option value="humide">Humide</option></select><p class="note" id="scenarioNote"></p><label for="force">Effort vertical par roue <span class="val" id="fv"></span></label><input id="force" type="range" min="5" max="80" value="25" step="1">
@@ -128,6 +134,18 @@ function renderScene(F,S){
  $('sceneCaption').textContent='Enfoncement maximal : '+fr(maxMM,1)+' mm · Résiduel théorique : '+fr(resMM,1)+' mm · Affichage amplifié ×'+fr(scale,2)+' (non à l’échelle). Le pneu est illustratif.';
 }
 
+function footprint(F,width,diam,inflate,carcass){const contactKpa=inflate*100+carcass;const calculated=F/contactKpa;const effWidth=width*.85;const length=calculated/effWidth;const admissible=length<=.60*diam;return {contactKpa,calculated,effWidth,length,admissible};}
+function tyreUpdate(){
+ const mode=$('tireMode').value,F=Number(force.value),w=Number($('tireWidth').value),d=Number($('tireDiameter').value),pi=Number($('inflation').value),pc=Number($('carcass').value);
+ $('tireWidthV').textContent=fr(w,2)+' m';$('tireDiameterV').textContent=fr(d,2)+' m';$('inflationV').textContent=fr(pi,1)+' bar';$('carcassV').textContent=fr(pc,0)+' kPa';
+ const o=footprint(F,w,d,pi,pc);
+ if(mode==='estimated' && o.admissible && o.calculated>=.05 && o.calculated<=1){surface.value=o.calculated.toFixed(2);}
+ surface.disabled=mode==='estimated';
+ $('tireResult').className=o.admissible?'good':'warn';
+ $('tireResult').textContent=(mode==='measured'?'Surface librement définie. ':'Estimation de surface = '+fr(o.calculated,3)+' m². ')+'Longueur calculée : '+fr(o.length,2)+' m ; largeur effective supposée : '+fr(o.effWidth,2)+' m. '+(!o.admissible?'HORS DOMAINE : modifier les paramètres ou passer en mode mesuré.':'Hypothèses géométriques satisfaites ; modèle non calibré.');
+ draw();
+}
+
 const fr=(v,n=1)=>Number(v).toLocaleString('fr-FR',{maximumFractionDigits:n});
 function draw(){
 const F=Number(force.value),S=Number(surface.value),R=Number(seuil.value),P=F/S,K=P/R,E=Number($('modulus').value),nu=Number($('poisson').value);$('ev').textContent=fr(E,0)+' MPa';$('nuv').textContent=fr(nu,2);$('settleValue').textContent=fr(elasticSettlement(F,S,E,nu),2)+' mm';$('modulusValue').textContent=fr(E,0)+' MPa';$('settleInfo').textContent='Résultat d’élasticité idéalisée : ce déplacement est récupérable dans le modèle. Aucun tassement permanent calculé.';
@@ -145,6 +163,6 @@ h+='<circle cx="'+x(S)+'" cy="'+y(P)+'" r="7" fill="#102d50" stroke="white" stro
 h+='<text x="330" y="335" text-anchor="middle" font-size="13" fill="#263b54">Surface de contact (m²)</text><text x="8" y="16" font-size="12" fill="#263b54">kPa</text>';
 $('plot').innerHTML='<title id="graphtitle">Pression en fonction de la surface de contact</title><desc id="graphdesc">Effort '+fr(F,0)+' kN, surface '+fr(S,2)+' m², pression '+fr(P)+' kPa et seuil '+fr(R,0)+' kPa.</desc>'+h;
 }
-[force,surface,seuil,$('modulus'),$('poisson'),$('width'),$('kc'),$('kphi'),$('exponent'),$('unload')].forEach(el=>el.addEventListener('input',draw));[$('compareA'),$('compareB')].forEach(el=>el.addEventListener('input',draw));$('useA').addEventListener('click',()=>{surface.value=$('compareA').value;draw()});$('useB').addEventListener('click',()=>{surface.value=$('compareB').value;draw()});[$('sol'),$('humidity')].forEach(el=>el.addEventListener('change',soilChange));
-$('loadButton').addEventListener('click',()=>{wheelLoaded=!wheelLoaded;draw()});$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();
+[force,surface,seuil,$('modulus'),$('poisson'),$('width'),$('kc'),$('kphi'),$('exponent'),$('unload')].forEach(el=>el.addEventListener('input',draw));[$('tireMode'),$('tireWidth'),$('tireDiameter'),$('inflation'),$('carcass')].forEach(el=>el.addEventListener('input',tyreUpdate));force.addEventListener('input',tyreUpdate);[$('compareA'),$('compareB')].forEach(el=>el.addEventListener('input',draw));$('useA').addEventListener('click',()=>{surface.value=$('compareA').value;draw()});$('useB').addEventListener('click',()=>{surface.value=$('compareB').value;draw()});[$('sol'),$('humidity')].forEach(el=>el.addEventListener('change',soilChange));
+$('loadButton').addEventListener('click',()=>{wheelLoaded=!wheelLoaded;draw()});$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();tyreUpdate();
 </script></body></html>
