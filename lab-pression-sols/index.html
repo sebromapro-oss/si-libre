@@ -94,7 +94,7 @@ $('sinkplot').innerHTML=v;
 
 
 let wheelLoaded=true;
-let scenePhase=1,sceneAnimation=null;
+
 function renderScene(F,S){
  const b=Number($('width').value),kc=Number($('kc').value),kp=Number($('kphi').value),n=Number($('exponent').value),m=Number($('unload').value);
  const o=sinkage(F,S,b,kc,kp,n,m),cx=400,ground=178;
@@ -143,7 +143,7 @@ h+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#1266aa" stroke-wid
 h+='<line x1="'+L+'" x2="'+(L+W)+'" y1="'+y(R)+'" y2="'+y(R)+'" stroke="#bd671b" stroke-width="3" stroke-dasharray="8 6"/>';
 h+='<circle cx="'+x(S)+'" cy="'+y(P)+'" r="7" fill="#102d50" stroke="white" stroke-width="2"/>';
 h+='<text x="330" y="335" text-anchor="middle" font-size="13" fill="#263b54">Surface de contact (m²)</text><text x="8" y="16" font-size="12" fill="#263b54">kPa</text>';
-svg.innerHTML='<title id="graphtitle">Pression en fonction de la surface de contact</title><desc id="graphdesc">Effort '+fr(F,0)+' kN, surface '+fr(S,2)+' m², pression '+fr(P)+' kPa et seuil '+fr(R,0)+' kPa.</desc>'+h;
+$('plot').innerHTML='<title id="graphtitle">Pression en fonction de la surface de contact</title><desc id="graphdesc">Effort '+fr(F,0)+' kN, surface '+fr(S,2)+' m², pression '+fr(P)+' kPa et seuil '+fr(R,0)+' kPa.</desc>'+h;
 }
 [force,surface,seuil,$('modulus'),$('poisson'),$('width'),$('kc'),$('kphi'),$('exponent'),$('unload')].forEach(el=>el.addEventListener('input',draw));[$('compareA'),$('compareB')].forEach(el=>el.addEventListener('input',draw));$('useA').addEventListener('click',()=>{surface.value=$('compareA').value;draw()});$('useB').addEventListener('click',()=>{surface.value=$('compareB').value;draw()});[$('sol'),$('humidity')].forEach(el=>el.addEventListener('change',soilChange));
 $('loadButton').addEventListener('click',()=>{wheelLoaded=!wheelLoaded;draw()});$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();
