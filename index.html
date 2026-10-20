@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f4c81">
   <meta name="description" content="Réactivation mémoire en Sciences Industrielles">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?rev=12">
+  <link rel="stylesheet" href="styles.css?rev=13">
   <title>SI Réactivation</title>
 </head>
 <body>
@@ -105,6 +105,9 @@
           <p class="micro">Filtre par parcours et thème, coche exactement 4 questions, puis clique sur « Créer une séance ». Les boutons activer/désactiver servent uniquement à gérer la banque.</p>
         </div>
         <div class="bank-filters">
+          <label>Rechercher une notion ou une question
+            <input id="bankSearch" type="search" placeholder="Ex. moments, hydraulique, MRUV" autocomplete="off">
+          </label>
           <label>Parcours
             <select id="bankTrack">
               <option value="TSMA">BTS TSMA</option>
@@ -127,7 +130,8 @@
 
       <div class="section-head selection-bar">
         <div>
-          <p id="selectionCount" class="micro">0 / 4 sélectionnée(s)</p>
+          <p id="selectionCount" class="micro" aria-live="polite">0 / 4 sélectionnée(s)</p>
+          <p id="selectionPreview" class="micro" aria-live="polite">Sélectionne quatre questions pour préparer la séance.</p>
           <p id="themeHelp" class="micro">Les questions sont regroupées par thème puis par document source. Tu peux filtrer un thème, un document déposé ou sélectionner 4 questions librement.</p>
         </div>
         <div class="selection-actions">
@@ -206,6 +210,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="reactivation-v2.js?rev=14" defer></script>
+<script src="reactivation-v2.js?rev=15" defer></script>
 </body>
 </html>
