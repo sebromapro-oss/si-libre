@@ -62,7 +62,7 @@ small{color:#45556b}details{margin-top:14px}summary{cursor:pointer;font-weight:7
 <p id="sinkwarning" class="warn"></p>
 <p class="note">Loi de chargement : p = (k<sub>c</sub>/b + k<sub>φ</sub>) z<sup>n</sup>. Ici k<sub>c</sub> en kPa·m<sup>1−n</sup> et k<sub>φ</sub> en kPa/m<sup>n</sup> ; b en m, z en m. Décharge : p = m(p<sub>max</sub>/z<sub>max</sub>)(z − z<sub>rés</sub>). Les coefficients sont des exemples fictifs, pas des mesures du terrain.</p>
 <p class="note">Source : <a href="https://www.mdpi.com/2075-1702/10/12/1117">Machines (2022), formulation de Bekker</a>. Attention : la validité des lois de plaque pour un pneu souple réel est limitée ; ce modèle n'évalue ni la compaction profonde, ni la porosité, ni le comportement sous passages répétés.</p>
-</section><section class="panel wide"><h2>6 · Investigation et décision métier</h2>
+</section><section class="panel wide"><h2>6 · Autocontrôle scientifique et fonctionnel</h2><button type="button" id="runTests">Exécuter les vérifications</button><p id="testReport" role="status" class="note">Tests non exécutés dans ce navigateur.</p></section><section class="panel wide"><h2>7 · Investigation et décision métier</h2>
 <p><strong>Question flash :</strong> convertir 25 kN en newtons, rappeler la relation entre pression, force et surface, puis convertir 100 000 Pa en kPa.</p>
 <p><strong>Réactivation :</strong> définir pression, contrainte et déplacement ; convertir kPa et MPa ; rappeler la différence entre comportement élastique et plastique.</p><p><strong>Investigation :</strong> comparer des surfaces de 0,15 m², 0,25 m² et 0,50 m² à charge identique. Relever la pression de contact et les contraintes à 0,10 m, 0,30 m et 0,50 m. Expliquer quelle configuration protège le mieux les horizons étudiés et les limites du modèle.</p>
 <p><strong>Attention scientifique :</strong> cette simulation calcule la pression moyenne à l'interface roue–sol. Elle ne prédit ni la profondeur de tassement, ni les ornières, ni les déformations irréversibles. Pour cela, il faut des paramètres géotechniques mesurés et un modèle de propagation des contraintes et de comportement du sol validé.</p>
@@ -157,7 +157,40 @@ e.className=pass?'good':'warn';
 e.textContent='Trelleborg TM800 HS 650/65 R38 · '+key+' bar · capacité tabulée '+fr(kg,0)+' kg/pneu · charge imposée '+fr(loadKg,0)+' kg équivalents · marge '+fr(spare,0)+' kg. '+(pass?'Compatible avec la charge tabulée pour cette condition seulement.':'Charge dépassant la limite de cette ligne constructeur.')+' Aucun calcul d’empreinte constructeur.';
 }
 
+function drawCompare(F){
+ const A=Number($('compareA').value),B=Number($('compareB').value);
+ for(const [key,S] of [['A',A],['B',B]]){$('compare'+key+'v').textContent=fr(S,2)+' m²';$('compare'+key+'p').textContent=fr(F/S,1)+' kPa';$('compare'+key+'z').textContent='À 0,30 m : '+fr(stress(F,S,.3),1)+' kPa';}
+ const max=Math.max(F/A,F/B)*1.12,x=p=>74+p/max*520,y=z=>16+z/.8*260;
+ let g='<line x1="74" y1="16" x2="74" y2="276" stroke="#394a5a"/><line x1="74" y1="276" x2="600" y2="276" stroke="#394a5a"/>';
+ for(let i=0;i<=4;i++){let z=.2*i;g+='<text x="66" y="'+(y(z)+4)+'" text-anchor="end" font-size="13">'+fr(z,2)+'</text>';}
+ for(const [area,color] of [[A,'#155aa4'],[B,'#bd6521']]){let v=[];for(let i=0;i<=80;i++){let z=i*.01;v.push(x(stress(F,area,z)).toFixed(1)+','+y(z).toFixed(1));}g+='<polyline points="'+v.join(' ')+'" fill="none" stroke="'+color+'" stroke-width="4"/>';}
+ g+='<text x="320" y="328" text-anchor="middle">Contrainte supplémentaire (kPa)</text><text x="415" y="24" fill="#155aa4">A bleu</text><text x="515" y="24" fill="#bd6521">B orange</text>';
+ $('comparePlot').innerHTML=g;
+ const a=stress(F,A,.3),b=stress(F,B,.3);
+ $('compareDecision').textContent='Pour ce modèle, à 0,30 m : A = '+fr(a,1)+' kPa ; B = '+fr(b,1)+' kPa. '+(Math.abs(a-b)<.001?'Les résultats sont égaux.':(a<b?'A':'B')+' transmet la plus faible contrainte centrale à cette profondeur.')+' Conclusion limitée aux hypothèses de Boussinesq.';
+}
+
 const fr=(v,n=1)=>Number(v).toLocaleString('fr-FR',{maximumFractionDigits:n});
+function runTests(){
+ const cases=[
+ ['Pression de référence',Math.abs(25/.25-100)<1e-10],
+ ['Boussinesq à z=0',Math.abs(stress(25,.25,0)-100)<1e-8],
+ ['Décroissance avec profondeur',stress(25,.25,.1)>stress(25,.25,.3)&&stress(25,.25,.3)>stress(25,.25,.8)],
+ ['Pression si surface doublée',Math.abs(25/.5-50)<1e-8],
+ ['Enfoncement Bekker, charge',Math.abs(sinkage(25,.25,.5,500,9000,1,2).z-.01)<1e-9],
+ ['Enfoncement Bekker, résiduel',Math.abs(sinkage(25,.25,.5,500,9000,1,2).zr-.005)<1e-9],
+ ['Surface pneu fictif',Math.abs(footprint(25,.6,1.7,1.2,20).calculated-25/140)<1e-9],
+ ['Graphique pression SVG',Boolean($('plot').querySelector('polyline'))],
+ ['Graphique de profondeur SVG',Boolean($('depthplot').querySelector('polyline'))],
+ ['Comparateur A/B SVG',Boolean($('comparePlot').querySelectorAll('polyline').length===2)],
+ ['Représentation roue SVG',Boolean($('scene').querySelector('ellipse'))]
+ ];
+ const ok=cases.filter(q=>q[1]).length;
+ $('testReport').textContent=ok+'/'+cases.length+' contrôles : '+cases.map(q=>(q[1]?'OK':'ÉCHEC')+' '+q[0]).join(' | ')+'. Vérifications locales, pas un essai de terrain ou une certification WCAG.';
+ $('testReport').className=ok===cases.length?'good':'warn';
+ return ok===cases.length;
+}
+
 function draw(){
 const F=Number(force.value),S=Number(surface.value),R=Number(seuil.value),P=F/S,K=P/R,E=Number($('modulus').value),nu=Number($('poisson').value);$('ev').textContent=fr(E,0)+' MPa';$('nuv').textContent=fr(nu,2);$('settleValue').textContent=fr(elasticSettlement(F,S,E,nu),2)+' mm';$('modulusValue').textContent=fr(E,0)+' MPa';$('settleInfo').textContent='Résultat d’élasticité idéalisée : ce déplacement est récupérable dans le modèle. Aucun tassement permanent calculé.';
 $('fv').textContent=fr(F,0)+' kN';$('sv').textContent=fr(S,2)+' m²';$('rv').textContent=fr(R,0)+' kPa';$('pv').textContent=fr(P)+' kPa';$('kv').textContent=fr(K,2)+' ×';
@@ -176,5 +209,5 @@ $('plot').innerHTML='<title id="graphtitle">Pression en fonction de la surface d
 for(const fn of [()=>depth(F,S,R),()=>drawSink(F,S),()=>renderScene(F,S),()=>drawCompare(F),()=>checkManufacturer(F)]) {try{fn()}catch(e){console.error('LAB auxiliary chart error',e)}}
 }
 [force,surface,seuil,$('modulus'),$('poisson'),$('width'),$('kc'),$('kphi'),$('exponent'),$('unload')].forEach(el=>el.addEventListener('input',draw));[$('tireMode'),$('tireWidth'),$('tireDiameter'),$('inflation'),$('carcass')].forEach(el=>el.addEventListener('input',tyreUpdate));force.addEventListener('input',tyreUpdate);$('tirePressureSpec').addEventListener('change',draw);[$('compareA'),$('compareB')].forEach(el=>el.addEventListener('input',draw));$('useA').addEventListener('click',()=>{surface.value=$('compareA').value;draw()});$('useB').addEventListener('click',()=>{surface.value=$('compareB').value;draw()});[$('sol'),$('humidity')].forEach(el=>el.addEventListener('change',soilChange));
-$('loadButton').addEventListener('click',()=>{wheelLoaded=!wheelLoaded;draw()});$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();tyreUpdate();
+$('runTests').addEventListener('click',runTests);$('loadButton').addEventListener('click',()=>{wheelLoaded=!wheelLoaded;draw()});$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();tyreUpdate();runTests();
 </script></body></html>
