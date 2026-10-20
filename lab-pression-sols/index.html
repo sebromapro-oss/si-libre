@@ -18,7 +18,7 @@ small{color:#45556b}details{margin-top:14px}summary{cursor:pointer;font-weight:7
 </style></head><body>
 <header><h1>SI LAB · Effort à la roue et pression sur les sols</h1><p>Laboratoire numérique libre · Investigation mécanique · Version pédagogique 1.0</p></header>
 <main>
-<section class="panel" aria-label="Paramètres"><h2>1 · Paramètres</h2>
+<section class="panel wide"><h2>Visualisation métier · Roue et sol en coupe</h2><p class="note">Schéma vectoriel pédagogique synchronisé aux calculs. Déformations amplifiées à l'écran pour être visibles ; ce n'est pas une photographie ni une simulation par éléments finis.</p><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button type="button" id="loadButton" style="max-width:220px">Décharger la roue</button><span id="phaseLabel" role="status">Roue chargée</span></div><svg id="scene" viewBox="0 0 800 430" role="img" aria-label="Coupe du sol avec roue, empreinte et ornière calculée"></svg><p id="sceneCaption" class="note" aria-live="polite"></p></section><section class="panel" aria-label="Paramètres"><h2>1 · Paramètres</h2>
 <label for="sol">Texture du sol</label><select id="sol"><option value="limon">Limoneux</option><option value="sable">Sableux</option><option value="argile">Argileux</option></select>
 <p class="note">La texture ne détermine pas à elle seule la résistance. Humidité, densité et structure doivent aussi être étudiées.</p>
 <label for="humidity">Humidité (scénario pédagogique)</label><select id="humidity"><option value="sec">Sec</option><option value="intermediaire" selected>Intermédiaire</option><option value="humide">Humide</option></select><p class="note" id="scenarioNote"></p><label for="force">Effort vertical par roue <span class="val" id="fv"></span></label><input id="force" type="range" min="5" max="80" value="25" step="1">
@@ -87,11 +87,38 @@ v+='<circle cx="'+x(o.zr)+'" cy="'+y(0)+'" r="6" fill="#bd671b"/><text x="320" y
 $('sinkplot').innerHTML=v;
 }
 
+
+let wheelLoaded=true;
+function renderScene(F,S){
+const b=Number($('width').value),kc=Number($('kc').value),kp=Number($('kphi').value),n=Number($('exponent').value),m=Number($('unload').value);
+const o=sinkage(F,S,b,kc,kp,n,m);
+const depth=wheelLoaded?o.z:o.zr;
+const d=Math.min(44,depth*1000*2.2),span=Math.min(210,Math.max(90,S/b*185)),cx=400,ground=190;
+const tyreY=ground-103+d*.35;
+let p='<defs><linearGradient id="dirt" x2="0" y2="1"><stop stop-color="#9e724c"/><stop offset="1" stop-color="#59412e"/></linearGradient><radialGradient id="wheel"><stop stop-color="#626970"/><stop offset=".53" stop-color="#161e28"/><stop offset=".85" stop-color="#2c3540"/><stop offset="1" stop-color="#0b121a"/></radialGradient></defs>';
+p+='<rect width="800" height="430" fill="#e7f3fb"/><rect y="190" width="800" height="240" fill="url(#dirt)"/><rect y="262" width="800" height="5" fill="#c39c65" opacity=".7"/><rect y="344" width="800" height="5" fill="#a67d58" opacity=".6"/>';
+let floor='M 0 190 L '+(cx-span/2-55)+' 190 Q '+(cx-span/2)+' 190 '+(cx-span/2)+' '+(ground+d*.65)+' Q '+cx+' '+(ground+d*1.2)+' '+(cx+span/2)+' '+(ground+d*.65)+' Q '+(cx+span/2+40)+' 190 800 190';
+p+='<path d="'+floor+'" fill="none" stroke="#352719" stroke-width="7"/>';
+for(let i=0;i<4;i++){let ww=span*(1+i*.45),yy=ground+25+i*42;let opacity=Math.max(.12,.52-i*.1);p+='<ellipse cx="'+cx+'" cy="'+yy+'" rx="'+ww*.6+'" ry="'+(16+i*8)+'" fill="#e89b42" opacity="'+opacity+'"/>';}
+p+='<circle cx="'+cx+'" cy="'+tyreY+'" r="99" fill="url(#wheel)" stroke="#101820" stroke-width="7"/>';
+for(let a=0;a<18;a++){let theta=a*Math.PI/9,x1=cx+84*Math.cos(theta),y1=tyreY+84*Math.sin(theta),x2=cx+99*Math.cos(theta+.05),y2=tyreY+99*Math.sin(theta+.05);p+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#717a84" stroke-width="8"/>';}
+p+='<circle cx="'+cx+'" cy="'+tyreY+'" r="43" fill="#c8d0d5" stroke="#637281" stroke-width="9"/><circle cx="'+cx+'" cy="'+tyreY+'" r="13" fill="#59636d"/>';
+p+='<path d="M400 5 V'+(tyreY-105)+'" stroke="#c42e2e" stroke-width="6"/><path d="M385 '+(tyreY-118)+' L400 '+(tyreY-100)+' L415 '+(tyreY-118)+'" fill="none" stroke="#c42e2e" stroke-width="6"/>';
+p+='<text x="418" y="35" fill="#9a1717" font-size="22" font-weight="bold">F = '+fr(F,0)+' kN</text>';
+p+='<text x="20" y="30" fill="#243c54" font-size="18">Contact : '+fr(S,2)+' m²</text><text x="20" y="54" fill="#243c54" font-size="18">Pression : '+fr(F/S,1)+' kPa</text>';
+p+='<text x="20" y="410" fill="#fff" font-size="17">0–0,8 m : zones de contrainte illustratives (non à l’échelle)</text>';
+p+='<text x="470" y="140" fill="#243c54" font-size="18">'+(wheelLoaded?'Charge appliquée':'Charge retirée')+'</text>';
+$('scene').innerHTML=p;
+$('phaseLabel').textContent=wheelLoaded?'Roue chargée':'Roue déchargée : empreinte résiduelle';
+$('loadButton').textContent=wheelLoaded?'Décharger la roue':'Recharger la roue';
+$('sceneCaption').textContent='Enfoncement maximal modèle : '+fr(o.z*1000,1)+' mm ; résiduel : '+fr(o.zr*1000,1)+' mm. Illustration agrandie, paramètres fictifs.';
+}
+
 const fr=(v,n=1)=>Number(v).toLocaleString('fr-FR',{maximumFractionDigits:n});
 function draw(){
 const F=Number(force.value),S=Number(surface.value),R=Number(seuil.value),P=F/S,K=P/R,E=Number($('modulus').value),nu=Number($('poisson').value);$('ev').textContent=fr(E,0)+' MPa';$('nuv').textContent=fr(nu,2);$('settleValue').textContent=fr(elasticSettlement(F,S,E,nu),2)+' mm';$('modulusValue').textContent=fr(E,0)+' MPa';$('settleInfo').textContent='Résultat d’élasticité idéalisée : ce déplacement est récupérable dans le modèle. Aucun tassement permanent calculé.';
 $('fv').textContent=fr(F,0)+' kN';$('sv').textContent=fr(S,2)+' m²';$('rv').textContent=fr(R,0)+' kPa';$('pv').textContent=fr(P)+' kPa';$('kv').textContent=fr(K,2)+' ×';
-depth(F,S,R);drawSink(F,S);const msg=K>1?'La pression dépasse le seuil hypothétique choisi. Étudier le risque avec des données de sol mesurées.':'La pression ne dépasse pas le seuil hypothétique choisi. Cela ne garantit pas l’absence de tassement en profondeur.';
+depth(F,S,R);drawSink(F,S);renderScene(F,S);const msg=K>1?'La pression dépasse le seuil hypothétique choisi. Étudier le risque avec des données de sol mesurées.':'La pression ne dépasse pas le seuil hypothétique choisi. Cela ne garantit pas l’absence de tassement en profondeur.';
 $('interpretation').className=K>1?'warn':'good';$('interpretation').textContent=msg;
 const L=66,T=16,W=552,H=266, maxP=Math.max(550,Math.ceil(F/.05/100)*100,R+50), x=s=>L+(s-.05)/.95*W,y=p=>T+H-(p/maxP)*H;
 let h='';
@@ -105,5 +132,5 @@ h+='<text x="330" y="335" text-anchor="middle" font-size="13" fill="#263b54">Sur
 svg.innerHTML='<title id="graphtitle">Pression en fonction de la surface de contact</title><desc id="graphdesc">Effort '+fr(F,0)+' kN, surface '+fr(S,2)+' m², pression '+fr(P)+' kPa et seuil '+fr(R,0)+' kPa.</desc>'+h;
 }
 [force,surface,seuil,$('modulus'),$('poisson'),$('width'),$('kc'),$('kphi'),$('exponent'),$('unload')].forEach(el=>el.addEventListener('input',draw));[$('sol'),$('humidity')].forEach(el=>el.addEventListener('change',soilChange));
-$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();
+$('loadButton').addEventListener('click',()=>{wheelLoaded=!wheelLoaded;draw()});$('reset').addEventListener('click',()=>{force.value=25;surface.value=.25;seuil.value=150;$('width').value=.5;$('kc').value=500;$('kphi').value=9000;$('exponent').value=1;$('unload').value=2;$('modulus').value=20;$('poisson').value=.30;$('sol').value='limon';$('humidity').value='intermediaire';soilChange()});soilChange();
 </script></body></html>
