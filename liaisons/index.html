@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./scene-docs.css">
   <link rel="stylesheet" href="./home-v4.css">
   <link rel="stylesheet" href="./mobile-pedagogy.css">
+  <link rel="stylesheet" href="./tracks-v5.css">
 </head>
 <body>
   <a class="skip" href="#contenu">Aller au contenu</a>
@@ -163,6 +164,7 @@
     <section id="view-catalog" class="view" hidden>
       <div class="page-heading"><span class="eyebrow dark">BIBLIOTHÈQUE MÉCANIQUE</span><h1>Explorer les liaisons</h1><p>Choisis une liaison, puis expérimente les six mouvements dans le repère local OXYZ.</p></div>
       <div class="toolbar"><label for="search">Rechercher une liaison</label><input id="search" type="search" placeholder="Pivot, glissière, rotule…"><span id="resultsCount" aria-live="polite"></span></div>
+      <section class="track-catalog-intro" id="trackCatalogSummary" aria-live="polite"></section>
       <div id="jointGrid" class="joint-grid"></div>
     </section>
     <section id="view-detail" class="view" hidden>
@@ -209,10 +211,11 @@
         </aside>
       </div>
       <div class="panel learning-panel" id="learningPanel" hidden><div><span class="eyebrow dark">FORMALISER</span><h2>Du mécanisme au modèle</h2><p id="modelText"></p><p id="formulaText"></p>
-          <div id="referenceDiagram" class="reference-diagram"></div><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Valider avec un défi →</button></div>
+          <div id="referenceDiagram" class="reference-diagram"></div><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Passer au défi du niveau →</button></div>
+      <section class="panel track-mission" id="levelMission" aria-label="Mission différenciée selon le diplôme" hidden></section>
     </section>
     <section id="view-challenge" class="view" hidden>
-      <div class="page-heading"><span class="eyebrow dark">ÉVALUATION FORMATIVE</span><h1>Défis atelier</h1><p>Identifie les mouvements possibles, sans regarder la solution. Une réponse expliquée vaut mieux qu'un clic au hasard.</p></div>
+      <div class="page-heading"><span class="eyebrow dark">ÉVALUATION FORMATIVE</span><h1>Défis atelier</h1><p id="quizDescription">L’évaluation s’adapte au diplôme. Observe, raisonne et justifie ton choix avant de consulter le corrigé.</p></div>
       <div class="challenge-layout">
         <section class="panel challenge-main" aria-labelledby="questionTitle">
           <div class="challenge-progress"><span id="quizStep">QUESTION 1 / 3</span><span id="quizLabel"></span></div>
@@ -226,8 +229,8 @@
           <div id="quizFinal" hidden></div>
         </section>
         <aside class="panel challenge-aside">
-          <span class="eyebrow dark">RAPPEL DE MÉTHODE</span><h2>Avant de répondre</h2>
-          <ol><li>Je nomme les deux solides.</li><li>Je place le repère OXYZ.</li><li>Je teste les translations Tx, Ty, Tz.</li><li>Je teste les rotations Rx, Ry, Rz.</li><li>Je compte les mouvements <strong>indépendants</strong>.</li></ol>
+          <span class="eyebrow dark" id="quizMethodTag">RAPPEL DE MÉTHODE</span><h2 id="quizMethodTitle">Avant de répondre</h2>
+          <ol id="quizMethodList"><li>Je nomme les deux solides.</li><li>Je place le repère OXYZ.</li><li>Je teste les mouvements.</li></ol>
           <p class="small-note">Un axe et un repère cohérents sont indispensables. Un hélicoïdal comporte deux mouvements liés pour une seule mobilité indépendante.</p>
           <button class="btn outline dark-outline full" id="newChallenge" type="button">Nouveau défi</button>
         </aside>
@@ -237,15 +240,25 @@
       <div class="page-heading"><span class="eyebrow dark">RESSOURCES / ENSEIGNEMENT</span><h1>Préparer une séance</h1><p>Utilisation en classe, en autonomie ou projetée au vidéoprojecteur.</p></div>
       <div class="resource-grid">
         <article class="panel"><h2>Objectifs pédagogiques</h2><p>Identifier deux solides, définir un repère local, reconnaître les translations et rotations et déterminer les mobilités autorisées et indépendantes.</p><h3>Prérequis</h3><p>Solide, axe, point, translation, rotation et repérage dans l'espace.</p><h3>Critères de réussite</h3><p>Repère orienté, mouvement relatif explicité, DDL justifié, vocabulaire maîtrisé.</p></article>
-        <article class="panel"><h2>Déroulement conseillé</h2><ol><li>Rituel de réactivation : 2 min.</li><li>Démonstration projetée : 5 min.</li><li>Exploration guidée : 10 min.</li><li>Manipulation autonome : 15 min.</li><li>Défi et correction active : 10 min.</li><li>Synthèse : 5 min.</li></ol><p>La durée indicative de 47 minutes est adaptable aux CAP, Bac Pro et BTS.</p></article>
+        <article class="panel"><h2>Déroulement conseillé</h2><ol><li>Rituel de réactivation : 2 min.</li><li>Démonstration projetée : 5 min.</li><li>Exploration guidée : 10 min.</li><li>Manipulation autonome : 15 min.</li><li>Défi et correction active : 10 min.</li><li>Synthèse : 5 min.</li></ol><p>Le temps et les tâches varient selon le diplôme. Les durées proposées sont indicatives.</p></article>
         <article class="panel"><h2>Progression et confidentialité</h2><p>Les réussites sont enregistrées uniquement sur cet appareil via le stockage local du navigateur. Aucun nom, mot de passe, compte élève ou donnée de classe n'est demandé.</p><button type="button" id="exportProgress" class="btn outline dark-outline full">Exporter mon bilan (.txt)</button><button type="button" id="clearProgress" class="text-button">Réinitialiser ma progression locale</button><p id="exportStatus" role="status" class="muted"></p></article>
         <article class="panel"><h2>Références documentaires</h2><p>Illustrations animées : schémas didactiques, non symboles normalisés certifiés. La norme de référence relative aux symboles cinématiques est ISO 3952-1:1981 (confirmée en 2024).</p><p><a href="https://www.iso.org/standard/9603.html" target="_blank" rel="noopener">ISO 3952-1 — fiche officielle</a></p><p><a href="https://sti.eduscol.education.fr/ressources_pedagogiques/schema-cinematiquecom" target="_blank" rel="noopener">Éduscol — schéma cinématique</a></p><p><a href="https://www.boutique.afnor.org/fr-fr/norme/nf-en-iso-39521/schemas-cinematiques-symboles-graphiques-partie-1/fa036838/6745" target="_blank" rel="noopener">AFNOR — NF EN ISO 3952-1</a></p></article>
       </div>
+      <section class="panel track-teacher" aria-labelledby="teacherTracksHeading">
+        <span class="eyebrow dark">DIFFÉRENCIATION V5</span><h2 id="teacherTracksHeading">Trois parcours, trois exigences distinctes</h2>
+        <div class="track-teacher-grid">
+          <article><h3>CAP — Identifier</h3><p><strong>Activité :</strong> observer et reconnaître le mouvement de deux solides.</p><p><strong>Preuve :</strong> choix expliqué oralement ou par une phrase courte.</p><p><strong>Critère :</strong> identification correcte et vocabulaire translation / rotation.</p></article>
+          <article><h3>Bac Pro — Diagnostiquer</h3><p><strong>Activité :</strong> relier un symptôme mécanique au contrôle approprié dans une situation d'atelier sécurisée.</p><p><strong>Preuve :</strong> choix du contrôle et justification écrite.</p><p><strong>Critère :</strong> logique de diagnostic, sécurité et référence à la documentation constructeur.</p></article>
+          <article><h3>BTS — Modéliser</h3><p><strong>Activité :</strong> caractériser les mobilités, les contraintes et les couplages, avec calcul pour le cas hélicoïdal.</p><p><strong>Preuve :</strong> hypothèses, repère et argument cinématique.</p><p><strong>Critère :</strong> modèle cohérent et nombre de DDL indépendants justifié.</p></article>
+        </div>
+        <p class="small-note">Les réussites automatiques sont formatives. L’enseignant conserve la validation des compétences certificatives.</p>
+      </section>
     </section>
   </main>
-  <footer><div class="footer-inner"><b>SI-LIAISONS</b><span>© Ressource pédagogique — Sciences industrielles / Maintenance</span><span>Version 0.1 • Découverte interactive</span></div></footer>
+  <footer><div class="footer-inner"><b>SI-LIAISONS</b><span>© Ressource pédagogique — Sciences industrielles / Maintenance</span><span>Version 5.0 • Parcours différenciés</span></div></footer>
   <script src="./motion-engine.js" defer></script>
   <script src="./scene-docs.js" defer></script>
+  <script src="./tracks-v5.js" defer></script>
   <script src="./app.js" defer></script>
 </body>
 </html>
