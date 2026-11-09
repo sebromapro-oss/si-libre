@@ -7,6 +7,7 @@
   <meta name="description" content="SI-LIAISONS : découvrir les liaisons mécaniques par l'observation, les mobilités et les axes XYZ. CAP, Bac Pro et BTS.">
   <title>SI-LIAISONS — L'atelier de découverte mécanique</title>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./motion.css">
 </head>
 <body>
   <a class="skip" href="#contenu">Aller au contenu</a>
@@ -105,14 +106,15 @@
       <div class="page-heading detail-heading"><div><span id="jointCategory" class="eyebrow dark">FICHE DE DÉCOUVERTE</span><h1 id="jointName">Liaison pivot</h1><p id="jointSubtitle"></p></div><span class="ddl-count" id="jointDdl">1 DDL</span></div>
       <div class="detail-layout">
         <div class="panel simulator">
-          <div class="panel-head"><strong>Manipulation cinématique</strong><span>Solide 1 = bleu • Solide 2 = orange</span></div>
+          <div class="panel-head"><strong>ATELIER DE MOUVEMENT • 3D</strong><span>Bleu = solide 1 fixe • Orange = solide 2 mobile</span></div>
           <div class="sim-stage">
-            <svg id="simSvg" viewBox="0 0 620 350" role="img" aria-label="Visualisation cinématique avec repère X Y Z"></svg>
-            <div class="sim-label">Repère local <b>O, X, Y, Z</b></div>
+            <canvas id="motionCanvas" class="motion-canvas" width="920" height="430" role="img" aria-label="Vue 3D didactique animée des deux solides dans le repère OXYZ. Le texte sous l’animation décrit le mouvement."></canvas>
           </div>
-          <p id="motionMessage" class="sim-message" aria-live="polite">Sélectionne un mouvement pour essayer.</p>
+          <div class="motion-summary" aria-live="polite"><strong id="motionState" class="motion-state">Observation</strong><p id="motionExplainer">Choisis un mouvement pour voir le solide orange se déplacer.</p></div>
+          <p id="motionMessage" class="sim-message" aria-live="polite">Teste les mouvements dans le repère OXYZ.</p>
+          <p class="motion-instruction"><b>À toi de jouer :</b> clique sur Tx, Ty, Tz, Rx, Ry ou Rz. Observe l’objet orange, la flèche et le résultat.</p>
           <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div>
-          <div class="sim-footer"><button class="btn outline dark-outline" type="button" id="resetMotion">Réinitialiser</button><span id="axisNotice">Axes orientés dans le repère local</span></div>
+          <div class="sim-footer"><div class="motion-actions"><button class="btn outline dark-outline" type="button" id="playMotion">Pause ▌▌</button><button class="btn outline dark-outline" type="button" id="resetMotion">Réinitialiser</button></div><span id="axisNotice">Axes orientés dans le repère local</span></div>
         </div>
         <aside class="detail-side">
           <div class="panel">
@@ -164,6 +166,7 @@
     </section>
   </main>
   <footer><div class="footer-inner"><b>SI-LIAISONS</b><span>© Ressource pédagogique — Sciences industrielles / Maintenance</span><span>Version 0.1 • Découverte interactive</span></div></footer>
+  <script src="./motion-engine.js" defer></script>
   <script src="./app.js" defer></script>
 </body>
 </html>
