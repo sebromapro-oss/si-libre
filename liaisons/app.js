@@ -62,21 +62,21 @@ function openJoint(id){
  const j=JOINTS.find(x=>x.id===id);if(!j || !offered().includes(j))return;
  s.current=j;s.motion=null;s.stage='observe';s.guessAttempts=0;s.guessValidated=false;
  $('jointOrdinal').textContent='Liaison '+(offered().indexOf(j)+1)+' / '+offered().length;
- $('jointName').textContent=j.name;$('jointSubtitle').textContent=j.short;
+ $('jointName').textContent=j.name;$('jointSubtitle').textContent='Observe les deux solides et repère leurs mouvements relatifs.';
  $('jointDdl').textContent='? DDL';
- $('jointCategory').textContent='FICHE DE DÉCOUVERTE • '+j.axis;
+ $('jointCategory').textContent='FICHE DE DÉCOUVERTE';
  $('situationTitle').textContent=j.work;$('situationText').textContent=j.story;$('objectiveText').textContent=j.objective;
  if(window.SI_MEDIA)window.SI_MEDIA.render(j);
  $('modelText').textContent=j.model;$('formulaText').textContent=j.formula||'';
  $('axisNotice').textContent=j.axis;
  $('mobilityMatrix').innerHTML=KEYS.map((k,i)=>'<div class="mobility-cell '+(j.m[i]?'allow':'lock')+'"><span>'+k+'</span><b>'+j.m[i]+'</b></div>').join('');
- $('ddlNote').textContent=j.id==='helicoidale'?'ATTENTION : Tx et Rx sont couplées, donc 1 seul degré de liberté.':(j.ddl+' mouvement'+(j.ddl>1?'s':'')+' indépendant'+(j.ddl>1?'s':'')+' dans le modèle.');
- $('motionButtons').innerHTML=KEYS.map((k,i)=>'<button type="button" class="'+(j.m[i]?'allowed':'blocked')+'" data-motion="'+k+'" aria-pressed="false" title="'+esc(COPY[k])+'"><b>'+k+'</b><small>'+(k[0]==='T'?'Glisser ':'Tourner ')+k[1]+'</small></button>').join('');
+ $('ddlNote').textContent=j.id==='helicoidale'?'ATTENTION : Tx et Rx sont couplées, donc 1 seul degré de liberté.':(j.ddl+' mouvement'+(j.ddl>1?'s':'')+' indépendant'+(j.ddl>1?'s':'')+' dans le modèle.');$('ddlNote').hidden=true;
+ $('motionButtons').innerHTML=KEYS.map((k,i)=>'<button type="button" class="untested" data-motion="'+k+'" aria-pressed="false" title="'+esc(COPY[k])+'"><b>'+k+'</b><small>'+(k[0]==='T'?'Glisser ':'Tourner ')+k[1]+'</small></button>').join('');
  $('motionMessage').textContent='Test : choisis l’une des six mobilités en observant le repère OXYZ.';
  $('motionMessage').classList.remove('blocked');
  $('guessGrid').innerHTML=KEYS.map(k=>'<label><input type="checkbox" name="guess" value="'+k+'"><span>'+k+'</span></label>').join('');
  $('guessFeedback').textContent='';$('modelReveal').hidden=true;$('learningPanel').hidden=true;
- nav('detail');motionTest(j.ddl===0?'Tx':(j.id==='helicoidale'?'Rx':KEYS[j.m.findIndex(Boolean)]));setStage('observe');
+ nav('detail');setStage('observe');
 }
 function scenePieces(j){
  const shapes={
@@ -98,7 +98,7 @@ function renderScene(j,motion){
 }
 function motionTest(k){
  const j=s.current;if(!j)return;s.motion=k;const idx=KEYS.indexOf(k),isAllowed=Boolean(j.m[idx]); 
- document.querySelectorAll('[data-motion]').forEach(b=>{const active=b.dataset.motion===k;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false');});
+ document.querySelectorAll('[data-motion]').forEach(b=>{const active=b.dataset.motion===k;b.classList.toggle('active',active);b.classList.toggle('allowed',active&&isAllowed);b.classList.toggle('blocked',active&&!isAllowed);b.classList.toggle('untested',!active);b.setAttribute('aria-pressed',active?'true':'false');});
  let msg;
  if(!isAllowed)msg=k+' bloqué : le modèle de liaison '+j.name.toLowerCase()+' interdit la '+COPY[k]+'.';
  else if(j.id==='helicoidale' && (k==='Tx'||k==='Rx')) msg=k+' possible, mais COUPLÉ à '+(k==='Tx'?'Rx':'Tx')+' : un seul degré de liberté indépendant.';
@@ -135,6 +135,15 @@ function setStage(stage){
  const labels={observe:'ÉTAPE 1 • OBSERVER',test:'ÉTAPE 2 • MANIPULER',model:'ÉTAPE 3 • MODÉLISER'};
  $('stepLabel').textContent=labels[stage];$('stepTitle').textContent=titles[stage];
  $('stepDescription').textContent=instructions[s.level][stage];
+ const criteria={
+ observe:'Réussite : je distingue les deux solides et je localise le repère local OXYZ.',
+ test:'Réussite : je teste les six mobilités et je justifie au moins un mouvement autorisé ou bloqué.',
+ model:'Réussite : je complète les six mobilités et je compte les degrés de liberté indépendants.'
+ };
+ $('stepCriteria').textContent=criteria[stage];
+ $('jointCategory').textContent='FICHE • '+(stage==='observe'?'OBSERVATION':j.axis);
+ $('jointSubtitle').textContent=s.guessValidated?j.short:(stage==='observe'?'Identifie les pièces et leur contact avant de manipuler.':'Teste les six mobilités, puis propose ton modèle.');
+ $('ddlNote').hidden=!s.guessValidated;
  $('stepNext').textContent=stage==='observe'?'Tester les mouvements →':stage==='test'?'Modéliser la liaison →':'Commencer le défi →';
  $('stepNext').disabled=stage==='model'&&!s.guessValidated;
  $('explorationTools').hidden=stage!=='test';
@@ -146,10 +155,15 @@ function setStage(stage){
  document.querySelectorAll('[data-stage]').forEach(b=>{
   const active=b.dataset.stage===stage;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false');
  });
- if(stage==='observe')$('motionMessage').textContent='Observe le solide bleu, le solide orange et les axes orientés.';
- else if(stage==='model')$('motionMessage').textContent='Déduis les mobilités sans lire la correction. Le tableau de correction reste masqué.';
- else if(s.motion)motionTest(s.motion);
- if(window.SI_MOTION&&window.SI_MOTION.refresh)window.SI_MOTION.refresh();
+ if(stage==='observe'){
+   $('motionMessage').textContent='Distingue les deux solides et trouve le repère OXYZ. Aucun résultat n’est encore indiqué.';
+   document.querySelectorAll('[data-motion]').forEach(b=>{b.classList.remove('active','allowed','blocked');b.classList.add('untested');b.setAttribute('aria-pressed','false');});
+   if(window.SI_MOTION?.observe)window.SI_MOTION.observe(j);
+ }else if(stage==='model'){
+   $('motionMessage').textContent='Déduis les mobilités puis vérifie. La correction reste masquée.';
+   if(window.SI_MOTION?.observe)window.SI_MOTION.observe(j);
+ }else if(s.motion)motionTest(s.motion);
+ else if(window.SI_MOTION?.observe)window.SI_MOTION.observe(j);
 }
 function checkMobility(event){
  event.preventDefault();const j=s.current;if(!j)return;
@@ -165,7 +179,7 @@ function checkMobility(event){
  const note=j.id==='helicoidale'?' Deux mouvements couplés ne donnent qu’un seul degré de liberté indépendant.':'';
  $('guessFeedback').textContent=(correct?'Bonne analyse ! ':'Correction à étudier : ')+j.model+note;
  $('guessFeedback').className=correct?'guess-correct':'guess-error';
- $('learningPanel').hidden=false;$('modelReveal').hidden=false;$('jointDdl').textContent=j.ddl+' DDL';
+ $('learningPanel').hidden=false;$('modelReveal').hidden=false;$('jointDdl').textContent=j.ddl+' DDL';$('ddlNote').hidden=false;$('jointSubtitle').textContent=j.short;
  $('stepNext').disabled=false;
  document.querySelectorAll('#guessGrid input').forEach(i=>i.disabled=true);
 }
@@ -186,8 +200,8 @@ function quizFor(j){
  else motionOptions=[j.choice,'Rx seulement','Tx seulement','Tous les mouvements'];
  motionOptions=Array.from(new Set(motionOptions)); while(motionOptions.length<4)motionOptions.push('Ty uniquement');
  return [
-  {title:'Combien de degrés de liberté INDEPENDANTS comporte la liaison '+j.name.toLowerCase()+' ?',hint:'Attention aux mouvements couplés.',options:rand([0,1,2,3,4,5].filter(x=> x===j.ddl || Math.abs(x-j.ddl)<=2)).map(String),answer:String(j.ddl),explain:j.model},
-  {title:'Quel ensemble de mouvements est possible dans le repère local indiqué ?',hint:j.axis+'. Les symboles T sont des translations, R des rotations.',options:rand(motionOptions),answer:j.choice,explain:j.model},
+  {title:'Combien de degrés de liberté INDEPENDANTS comporte la liaison '+j.name.toLowerCase()+' ?',hint:s.level==='CAP'?'Compte seulement les mouvements indépendants.':s.level==='BAC'?'Distingue les translations et rotations indépendantes.':'Analyse les paramètres indépendants, notamment en présence d’un couplage.',options:rand([j.ddl,...[0,1,2,3,4,5].filter(x=>x!==j.ddl).sort((a,b)=>Math.abs(a-j.ddl)-Math.abs(b-j.ddl)).slice(0,3)]).map(String),answer:String(j.ddl),explain:j.model},
+  {title:'Quel ensemble de mouvements est possible dans le repère local indiqué ?',hint:(s.level==='CAP'?'T = glisser et R = tourner. ':s.level==='BAC'?'Justifie chaque mobilité par le guidage. ':'Appuie-toi sur le repère local et les contraintes de contact. ')+j.axis+'.',options:rand(motionOptions),answer:j.choice,explain:j.model},
   {title:'Quelle situation d’atelier correspond à une liaison '+j.name.toLowerCase()+' ?',hint:'Cherche la fonction mécanique et les mouvements possibles.',options:rand([j.work,...other.map(o=>o.work)]),answer:j.work,explain:j.story}
  ];
 }
