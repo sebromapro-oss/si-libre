@@ -19,8 +19,24 @@ const JOINTS = [
  {id:'lineaire-rectiligne',name:'Linéaire rectiligne',ddl:4,level:'BTS',m:[1,1,0,1,0,1],axis:'Ligne X, normale Z',short:'Quatre mobilités pour un contact linéique rectiligne.',work:'Cylindre appuyé selon une génératrice',story:'Un cylindre repose sur une surface plane selon une génératrice orientée X. Le contact reste maintenu et la normale est Z.',objective:'Repérer la ligne de contact, la normale et les mobilités indépendantes.',model:'Dans le repère adopté : Tx, Ty, Rx et Rz sont possibles ; Tz et Ry sont bloquées.',choice:'Tx, Ty, Rx et Rz',kind:'line'}
 ];
 const s = {level:'CAP',view:'home',current:null,motion:null,quiz:null};
-let saved = {done:{},score:0};
-try { const p=JSON.parse(localStorage.getItem('si-liaisons-v1')||'null'); if(p && typeof p==='object')saved={done:p.done||{},score:Number(p.score)||0}; const l=localStorage.getItem('si-liaisons-level'); if(['CAP','BAC','BTS'].includes(l))s.level=l; if(localStorage.getItem('si-liaisons-dys')==='1')document.body.classList.add('dys'); }catch(e){}
+let saved = {done:{},score:0,trackDone:{},trackPoints:{CAP:0,BAC:0,BTS:0}};
+try {
+ const p=JSON.parse(localStorage.getItem('si-liaisons-v1')||'null');
+ if(p && typeof p==='object'){
+  saved={
+   done:p.done&&typeof p.done==='object'?p.done:{},
+   score:Number(p.score)||0,
+   trackDone:p.trackDone&&typeof p.trackDone==='object'?p.trackDone:{},
+   trackPoints:{
+    CAP:Number(p.trackPoints?.CAP)||0,
+    BAC:Number(p.trackPoints?.BAC)||0,
+    BTS:Number(p.trackPoints?.BTS)||0
+   }
+  };
+ }
+ const l=localStorage.getItem('si-liaisons-level');if(['CAP','BAC','BTS'].includes(l))s.level=l;
+ if(localStorage.getItem('si-liaisons-dys')==='1')document.body.classList.add('dys');
+}catch(e){}
 const $ = id=>document.getElementById(id);
 const esc = text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function store(){try{localStorage.setItem('si-liaisons-v1',JSON.stringify(saved));}catch(e){}}
@@ -34,7 +50,8 @@ function nav(view){
 }
 function renderStats(){
   const set=offered();$('availableCount').textContent=String(set.length);
-  $('completeCount').textContent=String(set.filter(j=>saved.done[j.id]).length);$('scoreTotal').textContent=String(saved.score);
+  $('completeCount').textContent=String(set.filter(j=>Boolean(saved.trackDone[s.level+':'+j.id])).length);
+  $('scoreTotal').textContent=String(saved.trackPoints[s.level]||0);
 }
 function miniSvg(j){
  const body={
@@ -52,15 +69,20 @@ function miniSvg(j){
  return '<svg viewBox="0 0 360 190" aria-hidden="true"><g opacity=".15" stroke="#b3e3ef"><path d="M5 50H355M5 100H355M5 150H355M60 5V185M120 5V185M180 5V185M240 5V185M300 5V185"/></g>'+body+'<path d="M30 168H94" stroke="#ffa36e" stroke-width="3"/><path d="M94 168l-9 -5m9 5l-9 5" stroke="#ffa36e" stroke-width="3"/><text x="102" y="173" font-size="16" fill="#fff" font-weight="800">X</text></svg>';
 }
 function renderCatalog(){
+ if(window.SI_TRACKS){
+  const l=window.SI_TRACKS.levels[s.level];
+  $('trackCatalogSummary').innerHTML='<h2>'+esc(l.name)+' · '+esc(l.phase)+'</h2><p><strong>Objectif :</strong> '+esc(l.objective)+'</p><p><strong>Prérequis :</strong> '+esc(l.prereq)+'</p><p><strong>Critère de réussite :</strong> '+esc(l.criteria)+'</p><p><strong>Mission :</strong> '+esc(l.action)+' · '+esc(l.duration)+' (indicatif)</p>';
+ }
  const query=$('search').value.trim().toLowerCase();
  const list=offered().filter(j=> (j.name+' '+j.work).toLowerCase().includes(query));
  $('resultsCount').textContent=list.length+' liaison'+(list.length>1?'s':'');
- $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Réussie':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
+ $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.</small></p><div class="joint-card-bottom"><span class="chip'+(saved.trackDone[s.level+':'+j.id]?' done':'')+'">'+(saved.trackDone[s.level+':'+j.id]?'✓ Réussie':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
  if(!list.length)$('jointGrid').innerHTML='<p>Aucun résultat. Essaie un autre mot.</p>';
 }
 function openJoint(id){
  const j=JOINTS.find(x=>x.id===id);if(!j || !offered().includes(j))return;
  s.current=j;s.motion=null;s.stage='observe';s.guessAttempts=0;s.guessValidated=false;s.testedMotions=new Set();
+ if(window.SI_TRACKS)window.SI_TRACKS.render(j,s.level);
  $('jointOrdinal').textContent='Liaison '+(offered().indexOf(j)+1)+' / '+offered().length;
  $('jointName').textContent=j.name;$('jointSubtitle').textContent='Observe les deux solides et repère leurs mouvements relatifs.';
  $('jointDdl').textContent='? DDL';
@@ -139,13 +161,16 @@ function setStage(stage){
  const labels={observe:'ÉTAPE 1 • OBSERVER',test:'ÉTAPE 2 • MANIPULER',model:'ÉTAPE 3 • MODÉLISER'};
  $('stepLabel').textContent=labels[stage];$('stepTitle').textContent=titles[stage];
  $('stepDescription').textContent=instructions[s.level][stage];
+ const l=window.SI_TRACKS?.levels[s.level];
+ if(l){$('stepPrerequisites').textContent='Prérequis : '+l.prereq;}
+
  $('objectiveText').textContent=stage==='observe'?'Identifier les solides et le repère OXYZ.':stage==='test'?'Tester les six composantes et justifier les mouvements autorisés ou bloqués.':'Déterminer les mobilités indépendantes et proposer un modèle cinématique.';
  const criteria={
  observe:'Réussite : je distingue les deux solides et je localise le repère local OXYZ.',
  test:'Réussite : je teste les six mobilités et je justifie au moins un mouvement autorisé ou bloqué.',
  model:'Réussite : je complète les six mobilités et je compte les degrés de liberté indépendants.'
  };
- $('stepCriteria').textContent=criteria[stage];
+ $('stepCriteria').textContent=criteria[stage]+(l?' · Attendu '+s.level+' : '+l.criteria:'');
  $('jointCategory').textContent='FICHE • '+(stage==='observe'?'OBSERVATION':j.axis);
  $('jointSubtitle').textContent=s.guessValidated?j.short:(stage==='observe'?'Identifie les pièces et leur contact avant de manipuler.':'Teste les six mobilités, puis propose ton modèle.');
  $('ddlNote').hidden=!s.guessValidated;
@@ -156,6 +181,7 @@ function setStage(stage){
  $('fieldPhoto').hidden=stage!=='observe';
  $('mobilityPanel').hidden=stage!=='model';
  $('learningPanel').hidden=stage!=='model'||!s.guessValidated;
+ $('levelMission').hidden=stage!=='model'||!s.guessValidated;
  $('modelReveal').hidden=!s.guessValidated;
  $('jointDdl').textContent=s.guessValidated?j.ddl+' DDL':'? DDL';
  document.querySelectorAll('[data-stage]').forEach(b=>{
@@ -185,13 +211,14 @@ function checkMobility(event){
  const note=j.id==='helicoidale'?' Deux mouvements couplés ne donnent qu’un seul degré de liberté indépendant.':'';
  $('guessFeedback').textContent=(correct?'Bonne analyse ! ':'Correction à étudier : ')+j.model+note;
  $('guessFeedback').className=correct?'guess-correct':'guess-error';
- $('learningPanel').hidden=false;$('modelReveal').hidden=false;$('jointDdl').textContent=j.ddl+' DDL';$('ddlNote').hidden=false;$('jointSubtitle').textContent=j.short;
+ $('learningPanel').hidden=false;$('modelReveal').hidden=false;$('levelMission').hidden=false;$('jointDdl').textContent=j.ddl+' DDL';$('ddlNote').hidden=false;$('jointSubtitle').textContent=j.short;
  $('stepNext').disabled=false;$('objectiveText').textContent=j.objective;
  document.querySelectorAll('#guessGrid input').forEach(i=>i.disabled=true);
 }
 
 function rand(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 function quizFor(j){
+ if(window.SI_TRACKS)return window.SI_TRACKS.quiz(s.level,j,rand);
  const other=rand(JOINTS.filter(x=>x.id!==j.id)).slice(0,3);
  let motionOptions;
  if(j.ddl===0)motionOptions=['Aucun mouvement relatif','Tx uniquement','Rx uniquement','Trois rotations'];
@@ -219,7 +246,15 @@ function startQuiz(fixedId){
 function renderQuiz(){
  const q=s.quiz;if(!q)return;const question=q.qs[q.index];
  $('quizStep').textContent='QUESTION '+(q.index+1)+' / '+q.qs.length;
- $('quizLabel').textContent='Mécanisme : '+q.j.name;
+ $('quizLabel').textContent=s.level+' · '+q.j.name;
+ if(window.SI_TRACKS){
+  const l=window.SI_TRACKS.levels[s.level];
+  $('quizDescription').textContent=l.action+' : trois questions adaptées à ton niveau, avec correction et explication.';
+  $('quizMethodTag').textContent='MÉTHODE · '+s.level;
+  $('quizMethodTitle').textContent=l.phase;
+  const lines=s.level==='CAP'?['Je repère les deux solides.','Je distingue translation et rotation.','Je nomme le mouvement observé.']:s.level==='BAC'?['Je sécurise et formule le symptôme.','Je relie l’anomalie au guidage mécanique.','Je propose un contrôle vérifiable.']:['Je pose le repère local et les hypothèses.','Je déduis les mobilités indépendantes.','Je justifie le modèle et vérifie les limites.'];
+  $('quizMethodList').innerHTML=lines.map(x=>'<li>'+esc(x)+'</li>').join('');
+ }
  $('quizBar').style.width=((q.index+1)/q.qs.length*100)+'%';
  $('quizContext').textContent='REPÈRE LOCAL OXYZ • '+q.j.axis;
  $('questionTitle').textContent=question.title;$('questionHelp').textContent=question.hint;
@@ -243,7 +278,8 @@ function nextQuiz(){
  const q=s.quiz;if(!q)return;
  if(q.index<q.qs.length-1){q.index++;renderQuiz();return;}
  const earned=q.correct*10;saved.score+=earned;
- const passed=q.correct>=2;if(passed)saved.done[q.j.id]=true;store();
+ saved.trackPoints[s.level]=(saved.trackPoints[s.level]||0)+earned;
+ const passed=q.correct>=2;if(passed)saved.trackDone[s.level+':'+q.j.id]=true;store();
  $('quizForm').hidden=true;$('quizFeedback').hidden=true;$('nextQuestion').hidden=true;
  $('quizContext').textContent='BILAN DU DÉFI';$('questionTitle').textContent=q.correct+' / '+q.qs.length+' réponses justes';
  $('questionHelp').textContent='Score : +'+earned+' points. '+(passed?'Défi réussi sur cet appareil.':'Défi à reprendre : il faut 2 bonnes réponses sur 3.');
@@ -251,8 +287,11 @@ function nextQuiz(){
  $('retryThis').addEventListener('click',()=>startQuiz(q.j.id));renderStats();
 }
 function exportProgress(){
- const lines=['SI-LIAISONS - Bilan personnel','Date : '+new Date().toLocaleDateString('fr-FR'),'Parcours : '+s.level,'Points : '+saved.score,'Liaisons validées :'];
- JOINTS.filter(j=>saved.done[j.id]).forEach(j=>lines.push('- '+j.name));if(!JOINTS.some(j=>saved.done[j.id]))lines.push('(aucune)');
+ const lines=['SI-LIAISONS - Bilan formatif local','Date : '+new Date().toLocaleDateString('fr-FR'),'Parcours : '+s.level,'Points du parcours : '+(saved.trackPoints[s.level]||0),'Défis réussis du parcours :'];
+ JOINTS.filter(j=>saved.trackDone[s.level+':'+j.id]).forEach(j=>lines.push('- '+j.name));
+ if(!JOINTS.some(j=>saved.trackDone[s.level+':'+j.id]))lines.push('(aucun)');
+ lines.push('Ancien historique V4 non attribuable à un diplôme : '+Object.keys(saved.done).length+' liaison(s), '+(saved.score||0)+' points globaux.');
+ lines.push('Ce bilan formatif ne valide aucune compétence officielle.');
  const data=new Blob([lines.join('\n')+'\n'],{type:'text/plain;charset=utf-8'});
  const url=URL.createObjectURL(data),a=document.createElement('a');a.href=url;a.download='SI-LIAISONS-bilan.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);
  $('exportStatus').textContent='Bilan créé localement. Aucune donnée nominative transmise.';
@@ -310,6 +349,6 @@ function bind(){
  $('newChallenge').addEventListener('click',()=>startQuiz());
  $('quizForm').addEventListener('submit',submitQuiz);$('nextQuestion').addEventListener('click',nextQuiz);
  $('exportProgress').addEventListener('click',exportProgress);
- $('clearProgress').addEventListener('click',()=>{if(confirm('Effacer uniquement les scores et validations de cet appareil ?')){saved={done:{},score:0};store();renderStats();$('exportStatus').textContent='Progression locale réinitialisée.';}});
+ $('clearProgress').addEventListener('click',()=>{if(confirm('Effacer uniquement les scores et validations de cet appareil ?')){saved={done:{},score:0,trackDone:{},trackPoints:{CAP:0,BAC:0,BTS:0}};store();renderStats();$('exportStatus').textContent='Progression locale réinitialisée.';}});
 }
 bind();nav('home');
