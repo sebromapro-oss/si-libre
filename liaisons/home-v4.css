@@ -180,3 +180,26 @@ body{background:#f3f7f9}
  .landing-v4 button,.landing-path-card,.path-photo img{transition:none!important}
  .landing-path-card:hover,.landing-v4 button:hover{transform:none!important}
 }
+
+/* En-tête unifié : un seul bandeau de navigation, sans doublon visuel. */
+.top-inner{gap:22px}
+.top .primary-nav{position:static;background:transparent;border:0;box-shadow:none;flex:1;min-width:0}
+.top .nav-inner{max-width:none;margin:0;padding:0;display:flex;align-items:center;justify-content:center;gap:1px;flex-wrap:nowrap}
+.top .nav-button{padding:13px 12px;font-size:.8rem;white-space:nowrap;border-bottom-width:2px}
+.top .header-actions{flex:0 0 auto}
+@media(max-width:1180px){
+ .top-inner{flex-wrap:wrap;gap:0 18px;padding:12px 16px}
+ .top .brand{order:1;flex:1}
+ .top .header-actions{order:2}
+ .top .primary-nav{order:3;flex:1 1 100%;margin-top:12px;border-top:1px solid #e5eef2;padding-top:5px;overflow:auto}
+ .top .nav-inner{justify-content:flex-start}
+}
+@media(max-width:540px){
+ .top .brand small{font-size:.53rem}
+ .top .brand b{font-size:1.05rem}
+ .top .brand-symbol{width:38px;height:38px;font-size:19px}
+ .top .header-actions{gap:6px}
+ .top .select-wrap select{max-width:125px;font-size:.77rem;padding:8px}
+ .top .icon-button{padding:8px 9px}
+ .top .nav-button{padding:11px 11px;font-size:.78rem}
+}
