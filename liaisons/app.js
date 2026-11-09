@@ -30,7 +30,7 @@ function nav(view){
   document.querySelectorAll('.view').forEach(x=>x.hidden=(x.id!=='view-'+view));
   document.querySelectorAll('.nav-button').forEach(x=>{ const yes=x.dataset.view===view; x.classList.toggle('active',yes);if(yes)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current'); });
   if(view==='home')renderStats(); if(view==='catalog')renderCatalog(); if(view==='challenge'&&!s.quiz)startQuiz(); 
-  window.scrollTo({top:0,behavior:'instant'});
+  window.scrollTo({top:0,behavior:'auto'});
 }
 function renderStats(){
   const set=offered();$('availableCount').textContent=String(set.length);
@@ -55,7 +55,7 @@ function renderCatalog(){
  const query=$('search').value.trim().toLowerCase();
  const list=offered().filter(j=> (j.name+' '+j.work).toLowerCase().includes(query));
  $('resultsCount').textContent=list.length+' liaison'+(list.length>1?'s':'');
- $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.short)+'<br><small>'+esc(j.work)+'</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Validée':j.ddl+' DDL')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
+ $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.+'</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Validée':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
  if(!list.length)$('jointGrid').innerHTML='<p>Aucun résultat. Essaie un autre mot.</p>';
 }
 function openJoint(id){
@@ -65,7 +65,7 @@ function openJoint(id){
  $('jointName').textContent=j.name;$('jointSubtitle').textContent='Observe les deux solides et repère leurs mouvements relatifs.';
  $('jointDdl').textContent='? DDL';
  $('jointCategory').textContent='FICHE DE DÉCOUVERTE';
- $('situationTitle').textContent=j.work;$('situationText').textContent=j.story;$('objectiveText').textContent=j.objective;
+ $('situationTitle').textContent=j.work;$('situationText').textContent=j.story;$('objectiveText').textContent='Identifier le contact, les deux solides et le repère local OXYZ.';
  if(window.SI_MEDIA)window.SI_MEDIA.render(j);
  $('modelText').textContent=j.model;$('formulaText').textContent=j.formula||'';
  $('axisNotice').textContent=j.axis;
@@ -135,6 +135,7 @@ function setStage(stage){
  const labels={observe:'ÉTAPE 1 • OBSERVER',test:'ÉTAPE 2 • MANIPULER',model:'ÉTAPE 3 • MODÉLISER'};
  $('stepLabel').textContent=labels[stage];$('stepTitle').textContent=titles[stage];
  $('stepDescription').textContent=instructions[s.level][stage];
+ $('objectiveText').textContent=stage==='observe'?'Identifier les solides et le repère OXYZ.':stage==='test'?'Tester les six composantes et justifier les mouvements autorisés ou bloqués.':'Déterminer les mobilités indépendantes et proposer un modèle cinématique.';
  const criteria={
  observe:'Réussite : je distingue les deux solides et je localise le repère local OXYZ.',
  test:'Réussite : je teste les six mobilités et je justifie au moins un mouvement autorisé ou bloqué.',
@@ -180,7 +181,7 @@ function checkMobility(event){
  $('guessFeedback').textContent=(correct?'Bonne analyse ! ':'Correction à étudier : ')+j.model+note;
  $('guessFeedback').className=correct?'guess-correct':'guess-error';
  $('learningPanel').hidden=false;$('modelReveal').hidden=false;$('jointDdl').textContent=j.ddl+' DDL';$('ddlNote').hidden=false;$('jointSubtitle').textContent=j.short;
- $('stepNext').disabled=false;
+ $('stepNext').disabled=false;$('objectiveText').textContent=j.objective;
  document.querySelectorAll('#guessGrid input').forEach(i=>i.disabled=true);
 }
 
