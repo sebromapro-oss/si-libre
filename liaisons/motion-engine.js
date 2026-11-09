@@ -349,7 +349,7 @@ function render(j,motion,preview=false){
  if(!C.canvas)return;
  C.ctx=C.canvas.getContext('2d');
  C.joint=j;C.motion=motion||'Tx';C.preview=preview;C.allowed=preview?false:Boolean(j.m[keys.indexOf(C.motion)]);
- C.playing=true;C.frame=0;C.start=0;
+ C.playing=!preview;C.frame=0;C.start=0;
  C.reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(C.raf)cancelAnimationFrame(C.raf);
  C.raf=requestAnimationFrame(drawFrame);
@@ -375,4 +375,5 @@ window.SI_MOTION={
  amplitude:value=>{C.amplitude=clamp(Number(value)||1,.25,1.5);C.start=0;C.frame=0;if(C.joint)render(C.joint,C.motion,C.preview);}
 };
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&C.joint&&!document.getElementById('view-detail')?.hidden&&!C.raf)C.raf=requestAnimationFrame(drawFrame);});
+window.addEventListener('resize',()=>{if(C.joint&&!document.getElementById('view-detail')?.hidden&&!C.raf)C.raf=requestAnimationFrame(drawFrame);});
 })();
