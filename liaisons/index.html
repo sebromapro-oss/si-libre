@@ -77,7 +77,7 @@
         </div>
         <div class="home-stats">
           <article class="stat"><strong id="availableCount">8</strong><span>Au programme</span></article>
-          <article class="stat"><strong id="completeCount">0</strong><span>Validées</span></article>
+          <article class="stat"><strong id="completeCount">0</strong><span>Réussies</span></article>
           <article class="stat"><strong id="scoreTotal">0</strong><span>Points</span></article>
         </div>
       </section>
@@ -187,7 +187,7 @@
           <div class="motion-summary" aria-live="polite"><strong id="motionState" class="motion-state">Observation</strong><p id="motionExplainer">Choisis un mouvement pour voir le solide orange se déplacer.</p></div>
           <p id="motionMessage" class="sim-message" aria-live="polite">Teste les mouvements dans le repère OXYZ.</p>
           <div id="explorationTools" hidden><p class="motion-instruction"><b>À toi de jouer :</b> clique sur Tx, Ty, Tz, Rx, Ry ou Rz. Observe l’objet orange, la flèche et le résultat.</p>
-          <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div>
+          <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div><p class="motion-attempt" id="attemptCounter" role="status">0 / 6 mouvements expérimentés. Teste-les tous avant de conclure.</p>
           <div class="sim-footer"><div class="motion-actions"><button class="btn outline dark-outline" type="button" id="playMotion">Pause ▌▌</button><button class="btn outline dark-outline" type="button" id="resetMotion">Réinitialiser</button></div><span id="axisNotice">Axes orientés dans le repère local</span></div>
           <div class="motion-adjust"><label for="speed">Vitesse <output id="speedOut">1×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.25" value="1"><label for="amplitude">Amplitude <output id="amplitudeOut">100 %</output></label><input id="amplitude" type="range" min="0.25" max="1.5" step="0.25" value="1"></div>
           </div>
