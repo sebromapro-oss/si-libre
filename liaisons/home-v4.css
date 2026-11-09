@@ -203,3 +203,10 @@ body{background:#f3f7f9}
  .top .icon-button{padding:8px 9px}
  .top .nav-button{padding:11px 11px;font-size:.78rem}
 }
+
+/* État de repli explicite si l'hébergement photographique externe est inaccessible. */
+.landing-feature-image:has(img.photo-missing),.path-photo:has(img.photo-missing){background:linear-gradient(145deg,#0e435f,#15334d)}
+.landing-v4 img.photo-missing{display:none}
+.landing-image-unavailable{display:flex;align-items:center;justify-content:center;text-align:center;color:#e9f6fb;font-weight:750;font-size:.9rem;line-height:1.5;padding:28px;position:absolute;inset:0}
+body.dys .landing-intro h1,body.dys .landing-heading h2,body.dys .landing-method h2{letter-spacing:0}
+body.dys .landing-hero-foot,body.dys .path-photo-credit{font-size:.82rem}
