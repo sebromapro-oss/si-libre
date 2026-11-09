@@ -17,7 +17,7 @@ const norm=a=>mul(a,1/len(a));
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const toRgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 const sh=(color,k)=>'rgb('+toRgb(color).map(x=>Math.round(clamp(x*k,0,255))).join(',')+')';
-const C={canvas:null,ctx:null,joint:null,motion:'Tx',allowed:false,playing:true,raf:0,start:0,w:920,h:430,reduced:false,frame:0};
+const C={canvas:null,ctx:null,joint:null,motion:'Tx',allowed:false,playing:true,raf:0,start:0,w:0,h:0,reduced:false,frame:0};
 const faces=[],paths=[];
 function face(points,color,alpha=1,details=false){
  if(points.length<3)return;
