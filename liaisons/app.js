@@ -55,12 +55,12 @@ function renderCatalog(){
  const query=$('search').value.trim().toLowerCase();
  const list=offered().filter(j=> (j.name+' '+j.work).toLowerCase().includes(query));
  $('resultsCount').textContent=list.length+' liaison'+(list.length>1?'s':'');
- $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Validée':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
+ $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Réussie':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
  if(!list.length)$('jointGrid').innerHTML='<p>Aucun résultat. Essaie un autre mot.</p>';
 }
 function openJoint(id){
  const j=JOINTS.find(x=>x.id===id);if(!j || !offered().includes(j))return;
- s.current=j;s.motion=null;s.stage='observe';s.guessAttempts=0;s.guessValidated=false;
+ s.current=j;s.motion=null;s.stage='observe';s.guessAttempts=0;s.guessValidated=false;s.testedMotions=new Set();
  $('jointOrdinal').textContent='Liaison '+(offered().indexOf(j)+1)+' / '+offered().length;
  $('jointName').textContent=j.name;$('jointSubtitle').textContent='Observe les deux solides et repère leurs mouvements relatifs.';
  $('jointDdl').textContent='? DDL';
@@ -104,6 +104,10 @@ function motionTest(k){
  else if(j.id==='helicoidale' && (k==='Tx'||k==='Rx')) msg=k+' possible, mais COUPLÉ à '+(k==='Tx'?'Rx':'Tx')+' : un seul degré de liberté indépendant.';
  else msg=k+' autorisé : '+COPY[k]+' possible dans le repère local OXYZ.';
  $('motionMessage').textContent=msg;$('motionMessage').classList.toggle('blocked',!isAllowed);
+ if(s.stage==='test'){
+  s.testedMotions.add(k);
+  $('attemptCounter').textContent=s.testedMotions.size+' / 6 mouvements expérimentés. '+(s.testedMotions.size===6?'Les six axes sont testés : tu peux maintenant proposer ton modèle.':'Poursuis les essais pour analyser les six mobilités.');
+ }
  renderScene(j,k);
 }
 
@@ -148,6 +152,7 @@ function setStage(stage){
  $('stepNext').textContent=stage==='observe'?'Tester les mouvements →':stage==='test'?'Modéliser la liaison →':'Commencer le défi →';
  $('stepNext').disabled=stage==='model'&&!s.guessValidated;
  $('explorationTools').hidden=stage!=='test';
+ $('attemptCounter').textContent=(s.testedMotions?.size||0)+' / 6 mouvements expérimentés. '+((s.testedMotions?.size||0)===6?'Prêt à modéliser.':'Teste-les tous avant de conclure.');
  $('fieldPhoto').hidden=stage!=='observe';
  $('mobilityPanel').hidden=stage!=='model';
  $('learningPanel').hidden=stage!=='model'||!s.guessValidated;
@@ -241,7 +246,7 @@ function nextQuiz(){
  const passed=q.correct>=2;if(passed)saved.done[q.j.id]=true;store();
  $('quizForm').hidden=true;$('quizFeedback').hidden=true;$('nextQuestion').hidden=true;
  $('quizContext').textContent='BILAN DU DÉFI';$('questionTitle').textContent=q.correct+' / '+q.qs.length+' réponses justes';
- $('questionHelp').textContent='Score : +'+earned+' points. '+(passed?'Liaison validée.':'La liaison n’est pas encore validée : il faut 2 bonnes réponses sur 3.');
+ $('questionHelp').textContent='Score : +'+earned+' points. '+(passed?'Défi réussi sur cet appareil.':'Défi à reprendre : il faut 2 bonnes réponses sur 3.');
  $('quizFinal').hidden=false;$('quizFinal').innerHTML='<p><b>'+esc(q.j.name)+'</b> — '+esc(q.j.axis)+'</p><p>'+esc(q.j.model)+'</p><button type="button" class="btn primary" id="retryThis">Recommencer ce défi</button>';
  $('retryThis').addEventListener('click',()=>startQuiz(q.j.id));renderStats();
 }
