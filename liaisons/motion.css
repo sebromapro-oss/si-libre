@@ -1,0 +1,39 @@
+/* SI-LIAISONS V2 — Laboratoire de mouvement — habillage sur feuille de style existante. */
+.detail-layout{grid-template-columns:minmax(0,1.8fr) minmax(280px,.75fr);align-items:start}
+.simulator{background:#fff;box-shadow:0 18px 36px rgba(9,31,52,.09);border:1px solid #bfd3df;padding:20px}
+.simulator .panel-head{display:flex;align-items:center;gap:10px;border-bottom:1px solid #e0e9ef;padding-bottom:15px}
+.simulator .panel-head strong{letter-spacing:.07em;font-size:.82rem;color:#0f527a}
+.simulator .panel-head span{font-weight:700;font-size:.78rem;color:#405d70}
+.sim-stage{border-radius:15px;background:#081b2d;border:2px solid #0c4266;min-height:220px;margin:18px 0 14px;box-shadow:inset 0 2px 20px rgba(0,0,0,.2)}
+.motion-canvas{width:100%;height:auto;aspect-ratio:920/430;display:block;border-radius:13px}
+.motion-summary{display:flex;flex-wrap:wrap;align-items:center;gap:12px;border:1px solid #bdddd7;background:#f1fbf7;border-radius:12px;padding:12px 15px}
+.motion-state{display:inline-flex;align-items:center;font-size:.8rem;font-weight:900;padding:9px 12px;border-radius:8px;letter-spacing:.035em;white-space:normal}
+.motion-state.state-yes{color:#075d47;background:#c9f3e4}
+.motion-state.state-no{color:#913c2e;background:#ffe2d8}
+.motion-summary:has(.state-no){background:#fff8f3;border-color:#ebcfbf}
+.motion-summary p{color:#183950;font-size:.92rem;line-height:1.45;margin:0;flex:1 1 200px;font-weight:630}
+.sim-message{background:transparent!important;border:none!important;padding:9px 0!important;margin:0 0 7px!important;min-height:0!important;font-size:.91rem!important;color:#30546b!important}
+.sim-message.blocked{color:#a64c33!important}
+.motion-instruction{margin:10px 0!important;padding:10px 12px;background:#eaf5fc;border-radius:9px;color:#163c53;font-size:.91rem}
+.motion-buttons{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px}
+.motion-buttons button{min-height:75px!important;background:#fff!important;border:2px solid #bed1dd!important;border-radius:12px!important;padding:8px 4px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#174460!important;transition:background .2s,border-color .2s,transform .2s;overflow:hidden}
+.motion-buttons button b{font-size:1.27rem!important;line-height:1}
+.motion-buttons button small{font-size:.67rem;letter-spacing:0;font-weight:750;line-height:1.2;white-space:nowrap}
+.motion-buttons button.allowed{border-color:#a8daca!important;background:#f5fbf8!important}
+.motion-buttons button.blocked{border-color:#edd0bd!important;background:#fff9f5!important}
+.motion-buttons button:hover{transform:translateY(-2px);border-color:#137b9f!important}
+.motion-buttons button.active,.motion-buttons button.active.allowed{color:#fff!important;border-color:#146c83!important;background:#146c83!important;box-shadow:0 6px 15px #146c8330}
+.motion-buttons button.active.blocked{background:#943f39!important;border-color:#943f39!important;color:#fff!important}
+.motion-actions{display:flex;gap:10px;flex-wrap:wrap}
+.sim-footer{border-top:1px solid #e5edf1;padding-top:13px}
+.sim-footer .btn{min-height:42px;padding:9px 14px;font-size:.83rem}
+.sim-footer span{font-weight:780;color:#244e66}
+.detail-side .panel{border:1px solid #c8dbe4}
+.detail-side h2{font-size:1.19rem}
+.mobility-cell{min-width:0}
+.learning-panel{border-left:5px solid #139fbb}
+.page-heading.detail-heading{margin-bottom:17px}
+body.dys .motion-buttons button small{font-size:.82rem}
+@media (max-width:1080px){.detail-layout{grid-template-columns:1fr}.detail-side{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+@media (max-width:700px){.simulator{padding:10px}.sim-stage{min-height:0}.simulator .panel-head{padding:5px 5px 12px}.motion-buttons{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.motion-buttons button{min-height:61px!important}.motion-summary{padding:10px}.motion-summary p{font-size:.85rem}.detail-side{display:flex;flex-direction:column;gap:12px}.sim-footer .btn{flex:1}.motion-actions{width:100%}.simulator .panel-head strong{font-size:.76rem}}
+@media(prefers-reduced-motion:reduce){.motion-buttons button{transition:none}}
