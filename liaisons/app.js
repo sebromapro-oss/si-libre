@@ -243,6 +243,19 @@ function bind(){
  $('dys').addEventListener('click',()=>{document.body.classList.toggle('dys');const active=document.body.classList.contains('dys');$('dys').setAttribute('aria-pressed',active?'true':'false');try{localStorage.setItem('si-liaisons-dys',active?'1':'0');}catch(e){}});
  document.querySelectorAll('.nav-button').forEach(x=>x.addEventListener('click',()=>{if(x.dataset.view==='challenge')startQuiz();else nav(x.dataset.view);}));
  document.querySelectorAll('[data-go]').forEach(x=>x.addEventListener('click',()=>{if(x.dataset.go==='challenge')startQuiz();else nav(x.dataset.go);}));
+ document.querySelectorAll('[data-featured-joint]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.featuredJoint;
+  if(JOINTS.some(j=>j.id===id))openJoint(id);
+ }));
+ document.querySelectorAll('[data-select-level]').forEach(b=>b.addEventListener('click',()=>{
+  const next=b.dataset.selectLevel;
+  if(!['CAP','BAC','BTS'].includes(next))return;
+  s.level=next;
+  $('level').value=next;
+  s.quiz=null;
+  try{localStorage.setItem('si-liaisons-level',next);}catch(err){}
+  nav('catalog');
+ }));
  $('flashButton').addEventListener('click',()=>{const el=$('flashAnswer');el.hidden=!el.hidden;$('flashButton').textContent=el.hidden?'Afficher la réponse':'Masquer la réponse';});
  $('search').addEventListener('input',renderCatalog);
  $('jointGrid').addEventListener('click',e=>{const b=e.target.closest('[data-joint]');if(b)openJoint(b.dataset.joint);});
