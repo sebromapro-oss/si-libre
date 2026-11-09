@@ -70,10 +70,10 @@ function openJoint(id){
  $('axisNotice').textContent=j.axis;
  $('mobilityMatrix').innerHTML=KEYS.map((k,i)=>'<div class="mobility-cell '+(j.m[i]?'allow':'lock')+'"><span>'+k+'</span><b>'+j.m[i]+'</b></div>').join('');
  $('ddlNote').textContent=j.id==='helicoidale'?'ATTENTION : Tx et Rx sont couplées, donc 1 seul degré de liberté.':(j.ddl+' mouvement'+(j.ddl>1?'s':'')+' indépendant'+(j.ddl>1?'s':'')+' dans le modèle.');
- $('motionButtons').innerHTML=KEYS.map((k,i)=>'<button type="button" class="'+(j.m[i]?'allowed':'blocked')+'" data-motion="'+k+'" aria-pressed="false" title="'+esc(COPY[k])+'">'+k+'</button>').join('');
+ $('motionButtons').innerHTML=KEYS.map((k,i)=>'<button type="button" class="'+(j.m[i]?'allowed':'blocked')+'" data-motion="'+k+'" aria-pressed="false" title="'+esc(COPY[k])+'"><b>'+k+'</b><small>'+(k[0]==='T'?'Glisser ':'Tourner ')+k[1]+'</small></button>').join('');
  $('motionMessage').textContent='Test : choisis l’une des six mobilités en observant le repère OXYZ.';
  $('motionMessage').classList.remove('blocked');
- renderScene(j,null);nav('detail');
+ nav('detail');motionTest(j.ddl===0?'Tx':(j.id==='helicoidale'?'Rx':KEYS[j.m.findIndex(Boolean)]));
 }
 function scenePieces(j){
  const shapes={
@@ -91,20 +91,7 @@ function scenePieces(j){
  return shapes[j.kind]||shapes.shaft;
 }
 function renderScene(j,motion){
- const p=scenePieces(j);
- let transform='',arrow='';
- const label=motion?motion:'OXYZ';
- if(motion && j.m[KEYS.indexOf(motion)]){
-   if(motion==='Tx')transform='translate(26 0)';
-   if(motion==='Ty')transform='translate(-16 12)';
-   if(motion==='Tz')transform='translate(0 -27)';
-   const isRot=motion.charAt(0)==='R';
-   if(isRot)arrow='<path d="M445 71a45 32 0 1 0 18 46" fill="none" stroke="#ffd38e" stroke-width="5" stroke-dasharray="9 5"/><path d="M464 115l-18 2 8 -16" fill="#ffd38e"/><text x="465" y="58" fill="#ffd38e" font-size="20" font-weight="800">'+motion+'</text>';
-   else arrow='<path d="M345 66L434 66" stroke="#ffd38e" stroke-width="6"/><path d="M434 66l-17 -10m17 10l-17 10" stroke="#ffd38e" stroke-width="5"/><text x="445" y="73" fill="#ffd38e" font-size="20" font-weight="800">'+motion+'</text>';
-   if(j.id==='helicoidale')arrow+='<text x="322" y="307" fill="#f6d7a1" font-size="15" font-weight="800">Rotation ↔ Translation couplées</text>';
- }
- $('simSvg').innerHTML='<defs><pattern id="gridx" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M38 0H0V38" fill="none" stroke="#2d4c64" stroke-width="1"/></pattern><linearGradient id="stageglow"><stop stop-color="#255675"/><stop offset="1" stop-color="#0b253a"/></linearGradient></defs><rect width="620" height="350" fill="url(#stageglow)"/><rect width="620" height="350" fill="url(#gridx)" opacity=".55"/><g opacity=".3" stroke="#75a5c4" stroke-width="2" stroke-dasharray="5 6"><path d="M145 175H546"/><path d="M336 43V280"/></g><g id="fixedSolid">'+p[0]+'</g><g id="movingSolid" transform="'+transform+'">'+p[1]+'</g>'+arrow+
- '<g stroke-width="4" stroke-linecap="round"><circle cx="82" cy="281" r="5" fill="#fff"/><path d="M82 281L179 281" stroke="#ffae7c"/><path d="M179 281l-14 -8m14 8l-14 8" stroke="#ffae7c"/><path d="M82 281L37 315" stroke="#7de1c1"/><path d="M37 315l15 -3m-15 3l7 -13" stroke="#7de1c1"/><path d="M82 281L82 181" stroke="#82b8ff"/><path d="M82 181l-8 15m8 -15l8 15" stroke="#82b8ff"/></g><g font-size="22" font-weight="850" fill="#fff"><text x="191" y="287">X</text><text x="21" y="335">Y</text><text x="75" y="167">Z</text><text x="60" y="275" font-size="15">O</text></g><rect x="428" y="15" width="177" height="32" rx="16" fill="#0b304b" stroke="#4b809f"/><text x="516" y="37" fill="#daeeff" text-anchor="middle" font-size="14" font-weight="800">'+esc(j.axis)+'</text>';
+ if(window.SI_MOTION)window.SI_MOTION.render(j,motion);
 }
 function motionTest(k){
  const j=s.current;if(!j)return;s.motion=k;const idx=KEYS.indexOf(k),isAllowed=Boolean(j.m[idx]); 
@@ -114,7 +101,7 @@ function motionTest(k){
  else if(j.id==='helicoidale' && (k==='Tx'||k==='Rx')) msg=k+' possible, mais COUPLÉ à '+(k==='Tx'?'Rx':'Tx')+' : un seul degré de liberté indépendant.';
  else msg=k+' autorisé : '+COPY[k]+' possible dans le repère local OXYZ.';
  $('motionMessage').textContent=msg;$('motionMessage').classList.toggle('blocked',!isAllowed);
- renderScene(j,isAllowed?k:null);
+ renderScene(j,k);
 }
 function rand(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 function quizFor(j){
@@ -195,6 +182,7 @@ function bind(){
  $('backCatalog').addEventListener('click',()=>nav('catalog'));
  $('motionButtons').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)motionTest(b.dataset.motion);});
  $('resetMotion').addEventListener('click',()=>{if(s.current)openJoint(s.current.id);});
+ $('playMotion').addEventListener('click',()=>{if(window.SI_MOTION)window.SI_MOTION.toggle();});
  $('detailChallenge').addEventListener('click',()=>{if(s.current)startQuiz(s.current.id);});
  $('newChallenge').addEventListener('click',()=>startQuiz());
  $('quizForm').addEventListener('submit',submitQuiz);$('nextQuestion').addEventListener('click',nextQuiz);
