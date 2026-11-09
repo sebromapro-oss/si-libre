@@ -239,6 +239,14 @@ function exportProgress(){
 }
 function bind(){
  $('level').value=s.level; $('dys').setAttribute('aria-pressed',document.body.classList.contains('dys')?'true':'false');
+ document.querySelectorAll('.landing-v4 img').forEach(img=>img.addEventListener('error',()=>{
+  if(img.classList.contains('photo-missing'))return;
+  img.classList.add('photo-missing');img.setAttribute('aria-hidden','true');
+  const note=document.createElement('span');
+  note.className='landing-image-unavailable';
+  note.textContent='Photographie indisponible — le laboratoire reste accessible.';
+  img.after(note);
+ }));
  $('level').addEventListener('change',e=>{s.level=e.target.value;try{localStorage.setItem('si-liaisons-level',s.level);}catch(err){}s.quiz=null;nav('home');});
  $('dys').addEventListener('click',()=>{document.body.classList.toggle('dys');const active=document.body.classList.contains('dys');$('dys').setAttribute('aria-pressed',active?'true':'false');try{localStorage.setItem('si-liaisons-dys',active?'1':'0');}catch(e){}});
  document.querySelectorAll('.nav-button').forEach(x=>x.addEventListener('click',()=>{if(x.dataset.view==='challenge')startQuiz();else nav(x.dataset.view);}));
