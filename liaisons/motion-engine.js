@@ -17,7 +17,7 @@ const norm=a=>mul(a,1/len(a));
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const toRgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 const sh=(color,k)=>'rgb('+toRgb(color).map(x=>Math.round(clamp(x*k,0,255))).join(',')+')';
-const C={canvas:null,ctx:null,joint:null,motion:'Tx',allowed:false,playing:true,raf:0,start:0,w:0,h:0,reduced:false,frame:0};
+const C={canvas:null,ctx:null,joint:null,motion:'Tx',allowed:false,playing:true,raf:0,start:0,w:0,h:0,reduced:false,frame:0,speed:1,amplitude:1};
 const faces=[],paths=[];
 function face(points,color,alpha=1,details=false){
  if(points.length<3)return;
@@ -308,11 +308,11 @@ function drawFrame(ts){
   C.ctx.setTransform(ratio,0,0,ratio,0,0);
  }
  if(!C.start)C.start=ts;
- if(!C.playing)C.start=ts-C.frame*2750;
- const phase=(ts-C.start)/2750;
+ if(!C.playing)C.start=ts-C.frame*(2750/C.speed);
+ const phase=(ts-C.start)/(2750/C.speed);
  const progress=C.reduced?.72:((1-Math.cos(phase*2*Math.PI))/2);
  if(C.playing)C.frame=phase;
- const q=C.allowed?progress:.08*(Math.sin(phase*12)*Math.max(0,1-progress));
+ const q=C.allowed?progress*C.amplitude:.08*(Math.sin(phase*12)*Math.max(0,1-progress));
  drawBackground();
  faces.length=0;paths.length=0;
  fixedModel(C.joint.kind);
@@ -361,6 +361,10 @@ function toggle(){
  if(btn)btn.textContent=C.playing?'Pause ▌▌':'Rejouer ▶';
  if(C.playing){C.start=0;C.frame=0;if(!C.raf)C.raf=requestAnimationFrame(drawFrame);}
 }
-window.SI_MOTION={render,toggle,refresh:()=>{if(C.joint)render(C.joint,C.motion);}};
+window.SI_MOTION={
+ render,toggle,refresh:()=>{if(C.joint)render(C.joint,C.motion);},
+ speed:value=>{C.speed=clamp(Number(value)||1,.25,2);C.start=0;C.frame=0;if(C.joint)render(C.joint,C.motion);},
+ amplitude:value=>{C.amplitude=clamp(Number(value)||1,.25,1.5);C.start=0;C.frame=0;if(C.joint)render(C.joint,C.motion);}
+};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&C.joint&&!document.getElementById('view-detail')?.hidden&&!C.raf)C.raf=requestAnimationFrame(drawFrame);});
 })();
