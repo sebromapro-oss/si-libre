@@ -55,7 +55,7 @@ function renderCatalog(){
  const query=$('search').value.trim().toLowerCase();
  const list=offered().filter(j=> (j.name+' '+j.work).toLowerCase().includes(query));
  $('resultsCount').textContent=list.length+' liaison'+(list.length>1?'s':'');
- $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.+'</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Validée':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
+ $('jointGrid').innerHTML=list.map((j,i)=>'<article class="joint-card"><div class="joint-visual"><span class="joint-num">LIAISON '+String(i+1).padStart(2,'0')+'</span>'+miniSvg(j)+'</div><div class="joint-card-content"><h2>'+esc(j.name)+'</h2><p>'+esc(j.work)+'<br><small>Observe puis détermine les mobilités.</small></p><div class="joint-card-bottom"><span class="chip'+(saved.done[j.id]?' done':'')+'">'+(saved.done[j.id]?'✓ Validée':'À découvrir')+'</span><button type="button" data-joint="'+j.id+'">Explorer →</button></div></div></article>').join('');
  if(!list.length)$('jointGrid').innerHTML='<p>Aucun résultat. Essaie un autre mot.</p>';
 }
 function openJoint(id){
