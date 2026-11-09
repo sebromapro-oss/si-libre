@@ -60,12 +60,13 @@ function renderCatalog(){
 }
 function openJoint(id){
  const j=JOINTS.find(x=>x.id===id);if(!j || !offered().includes(j))return;
- s.current=j;s.motion=null;
+ s.current=j;s.motion=null;s.stage='observe';s.guessAttempts=0;s.guessValidated=false;
  $('jointOrdinal').textContent='Liaison '+(offered().indexOf(j)+1)+' / '+offered().length;
  $('jointName').textContent=j.name;$('jointSubtitle').textContent=j.short;
- $('jointDdl').textContent=j.ddl+' DDL';
+ $('jointDdl').textContent='? DDL';
  $('jointCategory').textContent='FICHE DE DÉCOUVERTE • '+j.axis;
  $('situationTitle').textContent=j.work;$('situationText').textContent=j.story;$('objectiveText').textContent=j.objective;
+ if(window.SI_MEDIA)window.SI_MEDIA.render(j);
  $('modelText').textContent=j.model;$('formulaText').textContent=j.formula||'';
  $('axisNotice').textContent=j.axis;
  $('mobilityMatrix').innerHTML=KEYS.map((k,i)=>'<div class="mobility-cell '+(j.m[i]?'allow':'lock')+'"><span>'+k+'</span><b>'+j.m[i]+'</b></div>').join('');
@@ -73,7 +74,9 @@ function openJoint(id){
  $('motionButtons').innerHTML=KEYS.map((k,i)=>'<button type="button" class="'+(j.m[i]?'allowed':'blocked')+'" data-motion="'+k+'" aria-pressed="false" title="'+esc(COPY[k])+'"><b>'+k+'</b><small>'+(k[0]==='T'?'Glisser ':'Tourner ')+k[1]+'</small></button>').join('');
  $('motionMessage').textContent='Test : choisis l’une des six mobilités en observant le repère OXYZ.';
  $('motionMessage').classList.remove('blocked');
- nav('detail');motionTest(j.ddl===0?'Tx':(j.id==='helicoidale'?'Rx':KEYS[j.m.findIndex(Boolean)]));
+ $('guessGrid').innerHTML=KEYS.map(k=>'<label><input type="checkbox" name="guess" value="'+k+'"><span>'+k+'</span></label>').join('');
+ $('guessFeedback').textContent='';$('modelReveal').hidden=true;$('learningPanel').hidden=true;
+ nav('detail');motionTest(j.ddl===0?'Tx':(j.id==='helicoidale'?'Rx':KEYS[j.m.findIndex(Boolean)]));setStage('observe');
 }
 function scenePieces(j){
  const shapes={
@@ -103,6 +106,70 @@ function motionTest(k){
  $('motionMessage').textContent=msg;$('motionMessage').classList.toggle('blocked',!isAllowed);
  renderScene(j,k);
 }
+
+function setStage(stage){
+ if(!s.current||!['observe','test','model'].includes(stage))return;
+ s.stage=stage;const j=s.current;
+ const titles={
+  observe:"Observer la situation d'atelier",
+  test:"Tester les six mouvements",
+  model:"Construire le modèle cinématique"
+ };
+ const instructions={
+  CAP:{
+   observe:"Repère la pièce bleue fixe et la pièce orange. Montre l’origine O et les axes X, Y, Z. Quel mouvement essaierais-tu ?",
+   test:"Clique sur Tx, Ty, Tz, Rx, Ry et Rz. Observe la pièce orange et explique pourquoi le mouvement passe ou bloque.",
+   model:"Coche les mouvements possibles. Compare avec le résultat de tes essais, puis vérifie ta réponse."
+  },
+  BAC:{
+   observe:"Identifie les classes d’équivalence, la fonction mécanique et le repère local. Repère la liaison utile au fonctionnement.",
+   test:"Teste les translations et rotations. Justifie la mobilité à partir du guidage et des obstacles mécaniques visibles.",
+   model:"Déduis les DDL indépendants, complète le tableau et justifie ton choix par la géométrie de la liaison."
+  },
+  BTS:{
+   observe:"Isole les deux solides, définis le repère local OXYZ et localise l’axe, le centre ou la normale. Précise l’hypothèse de contact idéal.",
+   test:"Caractérise les mobilités relatives selon les six axes, puis distingue mouvements indépendants et mouvements cinématiquement couplés.",
+   model:"Établis la matrice des mobilités en repère local, vérifie le nombre de DDL indépendants et justifie le modèle cinématique."
+  }
+ };
+ const labels={observe:'ÉTAPE 1 • OBSERVER',test:'ÉTAPE 2 • MANIPULER',model:'ÉTAPE 3 • MODÉLISER'};
+ $('stepLabel').textContent=labels[stage];$('stepTitle').textContent=titles[stage];
+ $('stepDescription').textContent=instructions[s.level][stage];
+ $('stepNext').textContent=stage==='observe'?'Tester les mouvements →':stage==='test'?'Modéliser la liaison →':'Commencer le défi →';
+ $('stepNext').disabled=stage==='model'&&!s.guessValidated;
+ $('explorationTools').hidden=stage!=='test';
+ $('fieldPhoto').hidden=stage!=='observe';
+ $('mobilityPanel').hidden=stage!=='model';
+ $('learningPanel').hidden=stage!=='model'||!s.guessValidated;
+ $('modelReveal').hidden=!s.guessValidated;
+ $('jointDdl').textContent=s.guessValidated?j.ddl+' DDL':'? DDL';
+ document.querySelectorAll('[data-stage]').forEach(b=>{
+  const active=b.dataset.stage===stage;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false');
+ });
+ if(stage==='observe')$('motionMessage').textContent='Observe le solide bleu, le solide orange et les axes orientés.';
+ else if(stage==='model')$('motionMessage').textContent='Déduis les mobilités sans lire la correction. Le tableau de correction reste masqué.';
+ else if(s.motion)motionTest(s.motion);
+ if(window.SI_MOTION&&window.SI_MOTION.refresh)window.SI_MOTION.refresh();
+}
+function checkMobility(event){
+ event.preventDefault();const j=s.current;if(!j)return;
+ const selected=new Set(Array.from(document.querySelectorAll('#guessGrid input:checked')).map(x=>x.value));
+ const correct=KEYS.every((k,i)=>selected.has(k)===Boolean(j.m[i]));
+ s.guessAttempts=(s.guessAttempts||0)+1;
+ if(!correct&&s.guessAttempts<2){
+  $('guessFeedback').textContent='Pas encore. Reprends les essais selon les six axes puis vérifie de nouveau. Deux tentatives sont possibles avant la correction.';
+  $('guessFeedback').className='guess-error';
+  return;
+ }
+ s.guessValidated=true;
+ const note=j.id==='helicoidale'?' Deux mouvements couplés ne donnent qu’un seul degré de liberté indépendant.':'';
+ $('guessFeedback').textContent=(correct?'Bonne analyse ! ':'Correction à étudier : ')+j.model+note;
+ $('guessFeedback').className=correct?'guess-correct':'guess-error';
+ $('learningPanel').hidden=false;$('modelReveal').hidden=false;$('jointDdl').textContent=j.ddl+' DDL';
+ $('stepNext').disabled=false;
+ document.querySelectorAll('#guessGrid input').forEach(i=>i.disabled=true);
+}
+
 function rand(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 function quizFor(j){
  const other=rand(JOINTS.filter(x=>x.id!==j.id)).slice(0,3);
@@ -184,6 +251,21 @@ function bind(){
  $('resetMotion').addEventListener('click',()=>{if(s.current)openJoint(s.current.id);});
  $('playMotion').addEventListener('click',()=>{if(window.SI_MOTION)window.SI_MOTION.toggle();});
  $('detailChallenge').addEventListener('click',()=>{if(s.current)startQuiz(s.current.id);});
+ document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>setStage(b.dataset.stage)));
+ $('stepNext').addEventListener('click',()=>{
+  if(s.stage==='observe')setStage('test');
+  else if(s.stage==='test')setStage('model');
+  else if(s.stage==='model'&&s.guessValidated&&s.current)startQuiz(s.current.id);
+ });
+ $('mobilityGuess').addEventListener('submit',checkMobility);
+ $('speed').addEventListener('input',e=>{
+  $('speedOut').textContent=Number(e.target.value).toLocaleString('fr-FR')+'×';
+  if(window.SI_MOTION?.speed)window.SI_MOTION.speed(Number(e.target.value));
+ });
+ $('amplitude').addEventListener('input',e=>{
+  $('amplitudeOut').textContent=Math.round(Number(e.target.value)*100)+' %';
+  if(window.SI_MOTION?.amplitude)window.SI_MOTION.amplitude(Number(e.target.value));
+ });
  $('newChallenge').addEventListener('click',()=>startQuiz());
  $('quizForm').addEventListener('submit',submitQuiz);$('nextQuestion').addEventListener('click',nextQuiz);
  $('exportProgress').addEventListener('click',exportProgress);
