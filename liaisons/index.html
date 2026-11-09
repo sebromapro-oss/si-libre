@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b2037">
   <meta name="description" content="SI-LIAISONS, le laboratoire de cinématique SI-FRANCE : observer des mécanismes réels, manipuler les liaisons mécaniques en 3D et modéliser en repère OXYZ. CAP, Bac Pro, BTS.">
   <title>SI-LIAISONS — L'atelier de découverte mécanique</title>
@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./learning.css">
   <link rel="stylesheet" href="./scene-docs.css">
   <link rel="stylesheet" href="./home-v4.css">
+  <link rel="stylesheet" href="./mobile-pedagogy.css">
 </head>
 <body>
   <a class="skip" href="#contenu">Aller au contenu</a>
@@ -23,10 +24,10 @@
 
       <nav class="primary-nav" aria-label="Navigation principale">
         <div class="nav-inner">
-          <button class="nav-button active" data-view="home" aria-current="page">Accueil</button>
-          <button class="nav-button" data-view="catalog">Explorer les liaisons</button>
-          <button class="nav-button" data-view="challenge">Défis atelier</button>
-          <button class="nav-button" data-view="teacher">Espace ressources</button>
+          <button class="nav-button active" data-view="home" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-8h6v8"/></svg><span class="nav-long">Accueil</span><span class="nav-mobile">Accueil</span></button>
+          <button class="nav-button" data-view="catalog"><svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/><path d="M9 9h6v6H9z"/></svg><span class="nav-long">Explorer les liaisons</span><span class="nav-mobile">Liaisons</span></button>
+          <button class="nav-button" data-view="challenge"><svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3 2 3 4-2-1 5 5 3-5 2 1 6-4-3-3 3-1-6-4-2 5-3z"/></svg><span class="nav-long">Défis atelier</span><span class="nav-mobile">Défis</span></button>
+          <button class="nav-button" data-view="teacher"><svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="nav-long">Espace ressources</span><span class="nav-mobile">Ressources</span></button>
         </div>
       </nav>
       <div class="header-actions">
@@ -75,9 +76,9 @@
           <div><strong>Mon atelier</strong><small>Apprendre à son rythme</small></div>
         </div>
         <div class="home-stats">
-          <article class="stat"><strong id="availableCount">8</strong><span>Liaisons disponibles</span></article>
-          <article class="stat"><strong id="completeCount">0</strong><span>Liaisons validées</span></article>
-          <article class="stat"><strong id="scoreTotal">0</strong><span>Points de progression</span></article>
+          <article class="stat"><strong id="availableCount">8</strong><span>Au programme</span></article>
+          <article class="stat"><strong id="completeCount">0</strong><span>Réussies</span></article>
+          <article class="stat"><strong id="scoreTotal">0</strong><span>Points</span></article>
         </div>
       </section>
 
@@ -94,7 +95,7 @@
             <div class="path-photo"><img loading="lazy" decoding="async" width="700" height="500"
                src="https://commons.wikimedia.org/wiki/Special:FilePath/Close-up_of_a_hydraulic_part_of_a_tractor.jpg?width=700"
                alt="Détail réel d'un mécanisme hydraulique de tracteur agricole.">
-               <span class="path-label">NIVEAU 01</span></div>
+               <span class="path-label">CAP</span></div>
             <div class="path-body"><div class="path-heading"><span class="path-track">CAP</span><span class="path-count">8 liaisons</span></div>
               <h3>Découvrir les mouvements</h3>
               <p>Reconnaître une translation, une rotation et les mouvements bloqués sur un organe mécanique.</p>
@@ -105,7 +106,7 @@
             <div class="path-photo"><img loading="lazy" decoding="async" width="700" height="500"
                src="https://commons.wikimedia.org/wiki/Special:FilePath/Close-up_of_the_hydraulic_parts_of_an_excavator.jpg?width=700"
                alt="Vue rapprochée des composants hydrauliques et articulations d'une pelle mécanique.">
-               <span class="path-label">NIVEAU 02</span></div>
+               <span class="path-label">BAC PRO</span></div>
             <div class="path-body"><div class="path-heading"><span class="path-track">BAC PRO</span><span class="path-count">8 liaisons</span></div>
               <h3>Expliquer une fonction</h3>
               <p>Analyser les guidages, justifier les mouvements possibles et identifier les pièces en relation.</p>
@@ -116,7 +117,7 @@
             <div class="path-photo"><img loading="lazy" decoding="async" width="700" height="500"
                src="https://commons.wikimedia.org/wiki/Special:FilePath/Excavator_long_reach_boom_arm.jpg?width=700"
                alt="Ensemble flèche et bras d'une pelle hydraulique, mécanisme d'étude des articulations.">
-               <span class="path-label">NIVEAU 03</span></div>
+               <span class="path-label">BTS</span></div>
             <div class="path-body"><div class="path-heading"><span class="path-track">BTS TSMA / MMCM</span><span class="path-count">11 liaisons</span></div>
               <h3>Modéliser un mécanisme</h3>
               <p>Définir le repère OXYZ, déterminer les mobilités indépendantes et interpréter un modèle cinématique.</p>
@@ -166,14 +167,14 @@
     </section>
     <section id="view-detail" class="view" hidden>
       <div class="breadcrumbs"><button id="backCatalog" type="button">← Toutes les liaisons</button><span id="jointOrdinal"></span></div>
-      <div class="page-heading detail-heading"><div><span id="jointCategory" class="eyebrow dark">FICHE DE DÉCOUVERTE</span><h1 id="jointName">Liaison pivot</h1><p id="jointSubtitle"></p></div><span class="ddl-count" id="jointDdl">1 DDL</span></div>
+      <div class="page-heading detail-heading"><div><span id="jointCategory" class="eyebrow dark">FICHE DE DÉCOUVERTE</span><h1 id="jointName">Liaison pivot</h1><p id="jointSubtitle"></p></div><span class="ddl-count" id="jointDdl">? DDL</span></div>
       <nav class="learning-stages" aria-label="Étapes de la découverte">
         <button class="learning-stage active" data-stage="observe" type="button" aria-pressed="true"><span>01</span><strong>Observer</strong><small>Identifier les solides</small></button>
         <button class="learning-stage" data-stage="test" type="button" aria-pressed="false"><span>02</span><strong>Manipuler</strong><small>Tester les mouvements</small></button>
         <button class="learning-stage" data-stage="model" type="button" aria-pressed="false"><span>03</span><strong>Modéliser</strong><small>Déduire les DDL</small></button>
       </nav>
       <section id="stepGuide" class="panel stage-guide" aria-live="polite">
-        <div><span class="eyebrow dark" id="stepLabel">ÉTAPE 1 • OBSERVER</span><h2 id="stepTitle">Observer la situation d'atelier</h2><p id="stepDescription">Identifie les deux solides puis localise l'axe ou le centre de la liaison.</p></div>
+        <div><span class="eyebrow dark" id="stepLabel">ÉTAPE 1 • OBSERVER</span><h2 id="stepTitle">Observer la situation d'atelier</h2><p id="stepDescription">Identifie les deux solides puis localise l'axe ou le centre de la liaison.</p><p class="stage-prerequisites"><strong>Prérequis :</strong> reconnaître une translation, une rotation et les axes X, Y, Z.</p><p id="stepCriteria" class="stage-criteria">Réussite : je distingue les deux solides et je localise le repère local OXYZ.</p></div>
         <button type="button" id="stepNext" class="btn primary">Passer à la manipulation →</button>
       </section>
       <section id="fieldPhoto" class="field-photo panel" aria-label="Observer un mécanisme réel" hidden></section>
@@ -186,7 +187,7 @@
           <div class="motion-summary" aria-live="polite"><strong id="motionState" class="motion-state">Observation</strong><p id="motionExplainer">Choisis un mouvement pour voir le solide orange se déplacer.</p></div>
           <p id="motionMessage" class="sim-message" aria-live="polite">Teste les mouvements dans le repère OXYZ.</p>
           <div id="explorationTools" hidden><p class="motion-instruction"><b>À toi de jouer :</b> clique sur Tx, Ty, Tz, Rx, Ry ou Rz. Observe l’objet orange, la flèche et le résultat.</p>
-          <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div>
+          <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div><p class="motion-attempt" id="attemptCounter" role="status">0 / 6 mouvements expérimentés. Teste-les tous avant de conclure.</p>
           <div class="sim-footer"><div class="motion-actions"><button class="btn outline dark-outline" type="button" id="playMotion">Pause ▌▌</button><button class="btn outline dark-outline" type="button" id="resetMotion">Réinitialiser</button></div><span id="axisNotice">Axes orientés dans le repère local</span></div>
           <div class="motion-adjust"><label for="speed">Vitesse <output id="speedOut">1×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.25" value="1"><label for="amplitude">Amplitude <output id="amplitudeOut">100 %</output></label><input id="amplitude" type="range" min="0.25" max="1.5" step="0.25" value="1"></div>
           </div>
@@ -203,7 +204,7 @@
             <p class="muted">1 = mouvement possible • 0 = mouvement bloqué. Pour l'hélicoïdale, les deux mouvements sont couplés.</p>
             <form id="mobilityGuess" class="mobility-guess"><p><strong>À toi :</strong> sélectionne les mouvements possibles dans le repère local OXYZ.</p><div class="guess-grid" id="guessGrid"></div><button type="submit" class="btn outline dark-outline" id="checkGuess">Vérifier mes mobilités</button><p id="guessFeedback" role="status"></p></form>
             <div id="modelReveal" hidden><h3>Correction</h3><div class="mobility-matrix" id="mobilityMatrix"></div></div>
-            <div class="ddl-note" id="ddlNote"></div>
+            <div class="ddl-note" id="ddlNote" hidden></div>
           </div>
         </aside>
       </div>
