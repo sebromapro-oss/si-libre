@@ -174,7 +174,7 @@ function setStage(stage){
  $('jointCategory').textContent='FICHE • '+(stage==='observe'?'OBSERVATION':j.axis);
  $('jointSubtitle').textContent=s.guessValidated?j.short:(stage==='observe'?'Identifie les pièces et leur contact avant de manipuler.':'Teste les six mobilités, puis propose ton modèle.');
  $('ddlNote').hidden=!s.guessValidated;
- $('stepNext').textContent=stage==='observe'?'Tester les mouvements →':stage==='test'?'Modéliser la liaison →':'Commencer le défi →';
+ $('stepNext').textContent=stage==='observe'?'Tester les mouvements →':stage==='test'?'Modéliser la liaison →':'Réaliser la mission →';
  $('stepNext').disabled=stage==='model'&&!s.guessValidated;
  $('explorationTools').hidden=stage!=='test';
  $('attemptCounter').textContent=(s.testedMotions?.size||0)+' / 6 mouvements expérimentés. '+((s.testedMotions?.size||0)===6?'Prêt à modéliser.':'Teste-les tous avant de conclure.');
@@ -330,12 +330,13 @@ function bind(){
  $('motionButtons').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)motionTest(b.dataset.motion);});
  $('resetMotion').addEventListener('click',()=>{if(s.current)openJoint(s.current.id);});
  $('playMotion').addEventListener('click',()=>{if(window.SI_MOTION)window.SI_MOTION.toggle();});
- $('detailChallenge').addEventListener('click',()=>{if(s.current)startQuiz(s.current.id);});
+ $('detailChallenge').addEventListener('click',()=>{if(!$('levelMission').hidden)$('levelMission').scrollIntoView({behavior:'auto',block:'start'});});
+ $('levelMission').addEventListener('click',e=>{if(e.target.closest('#missionToQuiz')&&s.current)startQuiz(s.current.id);});
  document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>setStage(b.dataset.stage)));
  $('stepNext').addEventListener('click',()=>{
   if(s.stage==='observe')setStage('test');
   else if(s.stage==='test')setStage('model');
-  else if(s.stage==='model'&&s.guessValidated&&s.current)startQuiz(s.current.id);
+  else if(s.stage==='model'&&s.guessValidated&&!$('levelMission').hidden)$('levelMission').scrollIntoView({behavior:'auto',block:'start'});
  });
  $('mobilityGuess').addEventListener('submit',checkMobility);
  $('speed').addEventListener('input',e=>{
