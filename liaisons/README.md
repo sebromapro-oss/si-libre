@@ -1,4 +1,28 @@
 # SI-LIAISONS — laboratoire de cinématique
+## Branche expérimentale V3 — 9 novembre 2026
+
+**État : non fusionnée, V2 publique inchangée.**
+
+Évolutions intégrées :
+- Parcours explicite en 3 étapes (Observer → Manipuler → Modéliser).
+- Objectifs et consignes différenciés CAP, Bac Pro et BTS.
+- Réglage de vitesse (0,25× à 2×) et d'amplitude (25 % à 150 %) pour visualiser les mouvements.
+- Évaluation des six mobilités par cases à cocher avant révélation du tableau et du DDL.
+- Deux tentatives de modélisation, avec correction seulement après réussite ou second essai.
+- Conservation des 11 liaisons et des défis de la V2.
+- Contrôles statiques et moteur de rendu exécutés pour les 66 couples liaison/mouvement.
+
+Non intégrés à ce stade :
+- Photos sous licence claire pour les 11 situations professionnelles.
+- Symboles 2D et spatiaux vérifiés selon NF EN ISO 3952-1, à ne pas inventer.
+- Rotation libre à la souris ou au doigt du modèle 3D ; l'animation varie selon les mouvements testés mais la caméra reste fixe.
+- Graphe de liaisons et schéma cinématique multi-solides.
+- Liaison sécurisée au suivi nominatif SI-MISSION.
+- Recette utilisateur en classe et sur appareils physiques.
+
+**Condition de fusion :** test en navigateur de la branche déployée en prévisualisation, validation des modèles réels, accessibilité clavier/mobile et comparaison visuelle avec V2.
+
+---
 
 Application pédagogique statique hébergée sur GitHub Pages, dans le dépôt public sebromapro-oss/si-libre.
 
