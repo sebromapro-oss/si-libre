@@ -104,6 +104,15 @@
     <section id="view-detail" class="view" hidden>
       <div class="breadcrumbs"><button id="backCatalog" type="button">← Toutes les liaisons</button><span id="jointOrdinal"></span></div>
       <div class="page-heading detail-heading"><div><span id="jointCategory" class="eyebrow dark">FICHE DE DÉCOUVERTE</span><h1 id="jointName">Liaison pivot</h1><p id="jointSubtitle"></p></div><span class="ddl-count" id="jointDdl">1 DDL</span></div>
+      <nav class="learning-stages" aria-label="Étapes de la découverte">
+        <button class="learning-stage active" data-stage="observe" type="button" aria-pressed="true"><span>01</span><strong>Observer</strong><small>Identifier les solides</small></button>
+        <button class="learning-stage" data-stage="test" type="button" aria-pressed="false"><span>02</span><strong>Manipuler</strong><small>Tester les mouvements</small></button>
+        <button class="learning-stage" data-stage="model" type="button" aria-pressed="false"><span>03</span><strong>Modéliser</strong><small>Déduire les DDL</small></button>
+      </nav>
+      <section id="stepGuide" class="panel stage-guide" aria-live="polite">
+        <div><span class="eyebrow dark" id="stepLabel">ÉTAPE 1 • OBSERVER</span><h2 id="stepTitle">Observer la situation d'atelier</h2><p id="stepDescription">Identifie les deux solides puis localise l'axe ou le centre de la liaison.</p></div>
+        <button type="button" id="stepNext" class="btn primary">Passer à la manipulation →</button>
+      </section>
       <div class="detail-layout">
         <div class="panel simulator">
           <div class="panel-head"><strong>ATELIER DE MOUVEMENT • 3D</strong><span>Bleu = solide 1 fixe • Orange = solide 2 mobile</span></div>
@@ -112,9 +121,11 @@
           </div>
           <div class="motion-summary" aria-live="polite"><strong id="motionState" class="motion-state">Observation</strong><p id="motionExplainer">Choisis un mouvement pour voir le solide orange se déplacer.</p></div>
           <p id="motionMessage" class="sim-message" aria-live="polite">Teste les mouvements dans le repère OXYZ.</p>
-          <p class="motion-instruction"><b>À toi de jouer :</b> clique sur Tx, Ty, Tz, Rx, Ry ou Rz. Observe l’objet orange, la flèche et le résultat.</p>
+          <div id="explorationTools" hidden><p class="motion-instruction"><b>À toi de jouer :</b> clique sur Tx, Ty, Tz, Rx, Ry ou Rz. Observe l’objet orange, la flèche et le résultat.</p>
           <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div>
           <div class="sim-footer"><div class="motion-actions"><button class="btn outline dark-outline" type="button" id="playMotion">Pause ▌▌</button><button class="btn outline dark-outline" type="button" id="resetMotion">Réinitialiser</button></div><span id="axisNotice">Axes orientés dans le repère local</span></div>
+          <div class="motion-adjust"><label for="speed">Vitesse <output id="speedOut">1×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.25" value="1"><label for="amplitude">Amplitude <output id="amplitudeOut">100 %</output></label><input id="amplitude" type="range" min="0.25" max="1.5" step="0.25" value="1"></div>
+          </div>
         </div>
         <aside class="detail-side">
           <div class="panel">
@@ -123,15 +134,16 @@
             <p id="situationText"></p>
             <h3>Objectif</h3><p id="objectiveText"></p>
           </div>
-          <div class="panel">
+          <div class="panel" id="mobilityPanel" hidden>
             <h2>Identifier les mobilités</h2>
             <p class="muted">1 = mouvement possible • 0 = mouvement bloqué. Pour l'hélicoïdale, les deux mouvements sont couplés.</p>
-            <div class="mobility-matrix" id="mobilityMatrix"></div>
+            <form id="mobilityGuess" class="mobility-guess"><p><strong>À toi :</strong> sélectionne les mouvements possibles dans le repère local OXYZ.</p><div class="guess-grid" id="guessGrid"></div><button type="submit" class="btn outline dark-outline" id="checkGuess">Vérifier mes mobilités</button><p id="guessFeedback" role="status"></p></form>
+            <div id="modelReveal" hidden><h3>Correction</h3><div class="mobility-matrix" id="mobilityMatrix"></div></div>
             <div class="ddl-note" id="ddlNote"></div>
           </div>
         </aside>
       </div>
-      <div class="panel learning-panel"><div><span class="eyebrow dark">FORMALISER</span><h2>Du mécanisme au modèle</h2><p id="modelText"></p><p id="formulaText"></p><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Valider avec un défi →</button></div>
+      <div class="panel learning-panel" id="learningPanel" hidden><div><span class="eyebrow dark">FORMALISER</span><h2>Du mécanisme au modèle</h2><p id="modelText"></p><p id="formulaText"></p><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Valider avec un défi →</button></div>
     </section>
     <section id="view-challenge" class="view" hidden>
       <div class="page-heading"><span class="eyebrow dark">ÉVALUATION FORMATIVE</span><h1>Défis atelier</h1><p>Identifie les mouvements possibles, sans regarder la solution. Une réponse expliquée vaut mieux qu'un clic au hasard.</p></div>
