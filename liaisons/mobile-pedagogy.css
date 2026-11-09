@@ -150,3 +150,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,s
  body{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
 }
 @media(prefers-reduced-motion:reduce){.landing-v4 *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Éviter que la navigation inférieure masque le focus ou une commande. */
+html{scroll-padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+.stage-prerequisites{margin:7px 0 0!important;color:#485e70!important;font-size:.84rem!important}
+@media(max-width:780px){
+ .top .select-wrap select,.toolbar input,.quiz-option input{font-size:16px!important}
+ .landing-path-card .path-count{white-space:normal}
+}
