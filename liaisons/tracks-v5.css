@@ -51,3 +51,13 @@
  .mission-objective{font-size:.85rem;padding:11px}
  .track-teacher-grid>article{padding:14px}
 }
+
+.track-rubric-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;border:1px solid #d3e1e7;border-radius:10px}
+.track-rubric{width:100%;border-collapse:collapse;min-width:530px;font-size:.83rem}
+.track-rubric th,.track-rubric td{border-bottom:1px solid #e0e9ef;text-align:left;padding:12px 14px;line-height:1.35}
+.track-rubric thead th{color:#f2fcff;background:#0e4d68;font-weight:820}
+.track-rubric tbody th{font-weight:830;color:#193e56}
+.track-rubric tbody tr:last-child>*{background:#def3ef;color:#12594e;font-weight:860;border-bottom:0}
+.track-mission:focus-within{scroll-margin-top:15px}
+.mission-correction .btn{margin-top:14px}
+@media(max-width:650px){.track-rubric th,.track-rubric td{padding:10px 9px}}
