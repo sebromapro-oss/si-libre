@@ -66,6 +66,7 @@ function openJoint(id){
  $('jointDdl').textContent='? DDL';
  $('jointCategory').textContent='FICHE DE DÉCOUVERTE • '+j.axis;
  $('situationTitle').textContent=j.work;$('situationText').textContent=j.story;$('objectiveText').textContent=j.objective;
+ if(window.SI_MEDIA)window.SI_MEDIA.render(j);
  $('modelText').textContent=j.model;$('formulaText').textContent=j.formula||'';
  $('axisNotice').textContent=j.axis;
  $('mobilityMatrix').innerHTML=KEYS.map((k,i)=>'<div class="mobility-cell '+(j.m[i]?'allow':'lock')+'"><span>'+k+'</span><b>'+j.m[i]+'</b></div>').join('');
@@ -137,6 +138,7 @@ function setStage(stage){
  $('stepNext').textContent=stage==='observe'?'Tester les mouvements →':stage==='test'?'Modéliser la liaison →':'Commencer le défi →';
  $('stepNext').disabled=stage==='model'&&!s.guessValidated;
  $('explorationTools').hidden=stage!=='test';
+ $('fieldPhoto').hidden=stage!=='observe';
  $('mobilityPanel').hidden=stage!=='model';
  $('learningPanel').hidden=stage!=='model'||!s.guessValidated;
  $('modelReveal').hidden=!s.guessValidated;
