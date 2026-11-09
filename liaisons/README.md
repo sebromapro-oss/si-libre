@@ -10,10 +10,13 @@
 - Évaluation des six mobilités par cases à cocher avant révélation du tableau et du DDL.
 - Deux tentatives de modélisation, avec correction seulement après réussite ou second essai.
 - Conservation des 11 liaisons et des défis de la V2.
+- Section « photo/illustration d’atelier » sur 6 fiches avec auteur, nature de l’image, lien de licence et signalement du contre-exemple.
+- Croquis fonctionnels OXYZ des 11 liaisons, séparés explicitement des symboles normalisés.
+- Renvoi vers la planche officielle Éduscol DT 6/14 contenant les symboles plans et spatiaux.
 - Contrôles statiques et moteur de rendu exécutés pour les 66 couples liaison/mouvement.
 
 Non intégrés à ce stade :
-- Photos sous licence claire pour les 11 situations professionnelles.
+- Visuels pertinents et licenciés pour les 5 fiches restant sans photographie spécifique. Les six images actuelles sont chargées à distance depuis Wikimedia Commons : une connexion est nécessaire pour les afficher, contrairement au moteur de simulation.
 - Symboles 2D et spatiaux vérifiés selon NF EN ISO 3952-1, à ne pas inventer.
 - Rotation libre à la souris ou au doigt du modèle 3D ; l'animation varie selon les mouvements testés mais la caméra reste fixe.
 - Graphe de liaisons et schéma cinématique multi-solides.
@@ -48,7 +51,7 @@ Application pédagogique statique hébergée sur GitHub Pages, dans le dépôt p
 
 Les scènes sont des modèles 3D calculés en JavaScript et projetés sur un canvas 2D. Elles montrent réellement le changement d'orientation ou de position de chaque solide, mais la géométrie et les trajectoires sont simplifiées : il ne s'agit pas d'un simulateur CAO validé par mesure. Les illustrations ne sont pas à considérer comme des symboles cinématiques normalisés certifiés.
 
-Les symboles 2D/3D normalisés restent à intégrer après contrôle formel des conventions avec l'enseignant, à partir des documents de référence, notamment NF EN ISO 3952-1. Les photos d'atelier et le pilotage libre par glisser-déposer du modèle 3D ne font pas encore partie de cette version.
+Les symboles 2D/3D normalisés restent à intégrer après contrôle formel des conventions avec l'enseignant, à partir des documents de référence, notamment NF EN ISO 3952-1. La V3 ajoute six visuels externes documentés ; le pilotage libre par glisser-déposer du modèle 3D ne fait pas encore partie de cette version. Les images sont externes et peuvent être indisponibles hors connexion.
 
 Repère adopté dans les fiches : X à droite, Y projeté en bas à gauche, Z vers le haut. Le repère local doit être orienté selon la géométrie de la liaison avant d'attribuer Tx, Ty, Tz, Rx, Ry, Rz.
 
@@ -69,8 +72,20 @@ Les fichiers index.html, styles.css, app.js sont servis directement comme un dos
 
 **À réceptionner avant usage inspection :** qualité visuelle en mobile, manipulation réelle des six boutons, justesse de tous les symboles normatifs, photos sous licence compatible, essai par élèves CAP/BTS et lecture d'écran.
 
+## Banque iconographique V3 (Wikimedia Commons)
+
+- Encastrement, support seul : SICD Ltd, CC0, fichier MX Olimunllum Bracket.jpg.
+- Pivot : FNQ, domaine public, fichier Knuckle boom.jpg.
+- Glissière : Neerol34, CC BY-SA 4.0, illustration numérique de guidage de machine-outil (non photographie).
+- Hélicoïdale : Interiot, domaine public, fichier Jackscrew.jpg.
+- Rotule : lemonnn, domaine public, fichier Tie-rod.JPG.
+- Pivot glissant : Zdenek Vlasic, CC BY-SA 3.0, **contre-exemple** : image d'une glissière, signalée comme telle.
+
+Les sources et licences sont consultables en cliquant sur « Photo et licence (Wikimedia Commons) » à côté de chaque image. Les photographies ne sont pas des références métrologiques des liaisons.
+
 ## Sources
 
 - ISO 3952-1:1981 (confirmée en 2024) : https://www.iso.org/standard/9603.html
 - AFNOR — NF EN ISO 3952-1 : https://www.boutique.afnor.org/fr-fr/norme/nf-en-iso-39521/schemas-cinematiques-symboles-graphiques-partie-1/fa036838/6745
+- Éduscol — tableau officiel d’examen DT 6/14 : https://bnseep.eduscol.education.fr/ressources/examens/sujets/07/_0403164024_014.pdf#page=6
 - Éduscol — ressources schéma cinématique : https://sti.eduscol.education.fr/ressources_pedagogiques/schema-cinematiquecom
