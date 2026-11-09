@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b2037">
+  <meta name="description" content="SI-LIAISONS : découvrir les liaisons mécaniques par l'observation, les mobilités et les axes XYZ. CAP, Bac Pro et BTS.">
+  <title>SI-LIAISONS — L'atelier de découverte mécanique</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="./" aria-label="SI-LIAISONS — accueil">
+        <span class="brand-symbol" aria-hidden="true">S<span>↻</span></span>
+        <span><b>SI-LIAISONS</b><small>Laboratoire de cinématique</small></span>
+      </a>
+      <div class="header-actions">
+        <label class="select-wrap" for="level"><span>Parcours</span><select id="level">
+          <option value="CAP">CAP</option><option value="BAC">Bac Pro</option><option value="BTS">BTS TSMA / MMCM</option>
+        </select></label>
+        <button type="button" id="dys" class="icon-button" aria-pressed="false" title="Affichage confort de lecture">Aa <span class="sr-only">Confort de lecture</span></button>
+      </div>
+    </div>
+  </header>
+  <nav class="primary-nav" aria-label="Navigation principale">
+    <div class="nav-inner">
+      <button class="nav-button active" data-view="home" aria-current="page">Accueil</button>
+      <button class="nav-button" data-view="catalog">Explorer les liaisons</button>
+      <button class="nav-button" data-view="challenge">Défis atelier</button>
+      <button class="nav-button" data-view="teacher">Espace ressources</button>
+    </div>
+  </nav>
+  <main id="contenu">
+    <section id="view-home" class="view">
+      <div class="hero">
+        <div>
+          <span class="eyebrow">SCIENCES INDUSTRIELLES • MAINTENANCE</span>
+          <h1>Observe la machine.<br><em>Comprends la liaison.</em></h1>
+          <p>Des pièces réelles aux mouvements autorisés. Expérimente les translations, les rotations et les repères avant de retenir les symboles.</p>
+          <div class="hero-actions">
+            <button class="btn primary" data-go="catalog">Découvrir les liaisons <span aria-hidden="true">→</span></button>
+            <button class="btn outline" data-go="challenge">Lancer un défi</button>
+          </div>
+          <p class="hero-caption">Aucun compte nécessaire • Progression sur cet appareil • Gratuit</p>
+        </div>
+        <div class="hero-visual" aria-label="Repère X, Y, Z et deux solides en liaison pivot">
+          <svg viewBox="0 0 480 320" role="img" aria-labelledby="heroSvgTitle">
+            <title id="heroSvgTitle">Guidage d'un axe mécanique dans un palier, repère orthogonal X Y Z</title>
+            <defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c4d9e9"/><stop offset=".48" stop-color="#6c91ab"/><stop offset="1" stop-color="#d7e8f4"/></linearGradient><linearGradient id="blueS" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#55bdeb"/><stop offset="1" stop-color="#17629e"/></linearGradient></defs>
+            <g opacity=".15" stroke="#b6d7e9" stroke-width="1"><path d="M25 268H455M25 226H455M25 184H455M25 142H455M25 100H455M75 35V295M155 35V295M235 35V295M315 35V295M395 35V295"/></g>
+            <g transform="translate(47,32)">
+              <path d="M73 212L147 172L287 203L211 246Z" fill="#1c4564" stroke="#6896b5"/>
+              <path d="M113 146L188 105L290 126L213 168Z" fill="url(#blueS)" stroke="#b7d9f4" stroke-width="2"/>
+              <path d="M113 146V215L213 238V168Z" fill="#1f6c9a" stroke="#b7d9f4" stroke-width="2"/>
+              <path d="M213 168L290 126V196L213 238Z" fill="#15517b" stroke="#b7d9f4" stroke-width="2"/>
+              <ellipse cx="206" cy="176" rx="56" ry="24" transform="rotate(-23 206 176)" fill="#0e304b" stroke="#aad1e8" stroke-width="3"/>
+              <path d="M140 170L352 116" stroke="#d1e5f3" stroke-width="53" stroke-linecap="round"/>
+              <path d="M140 170L352 116" stroke="url(#steel)" stroke-width="43" stroke-linecap="round"/>
+              <ellipse cx="352" cy="116" rx="13" ry="23" transform="rotate(-14 352 116)" fill="#adc9dc" stroke="#e5f4fd" stroke-width="3"/>
+              <path d="M146 164L352 111" stroke="#e9f4fc" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+              <circle cx="204" cy="151" r="4" fill="#fff"/>
+              <path d="M200 151L365 109" stroke="#ffc763" stroke-width="2.5" stroke-dasharray="7 7"/>
+            </g>
+            <g stroke-width="4" stroke-linecap="round">
+              <circle cx="71" cy="257" r="5" fill="#fff"/>
+              <path d="M71 257L157 257" stroke="#f49f6a"/><path d="M157 257l-12 -7m12 7l-12 7" stroke="#f49f6a"/>
+              <path d="M71 257L29 281" stroke="#77d9bb"/><path d="M29 281l13 -1m-13 1l7 -11" stroke="#77d9bb"/>
+              <path d="M71 257L71 171" stroke="#75aaf5"/><path d="M71 171l-7 12m7 -12l7 12" stroke="#75aaf5"/>
+            </g>
+            <g font-size="20" font-weight="800" fill="#fff"><text x="166" y="264">X</text><text x="17" y="298">Y</text><text x="65" y="159">Z</text><text x="52" y="249" font-size="13">O</text></g>
+            <rect x="303" y="269" width="154" height="30" rx="15" fill="#0d3552" stroke="#609bc0"/><text x="380" y="290" fill="#b5e6fa" font-size="13" font-weight="700" text-anchor="middle">PIVOT • 1 DDL</text>
+          </svg>
+          <span class="visual-caption">Repère d'étude : O • X • Y • Z</span>
+        </div>
+      </div>
+      <div class="home-stats">
+        <article class="stat"><strong id="availableCount">8</strong><span>liaisons à explorer</span></article>
+        <article class="stat"><strong id="completeCount">0</strong><span>liaisons validées</span></article>
+        <article class="stat"><strong id="scoreTotal">0</strong><span>points gagnés</span></article>
+      </div>
+      <div class="section-header"><div><span class="eyebrow dark">DIRE → MONTRER → GUIDER → SUPERVISER</span><h2>Un parcours d'apprentissage, pas un catalogue</h2></div></div>
+      <div class="steps">
+        <article><span>01</span><h3>Réactiver</h3><p>Retrouver les six mouvements possibles et le sens des axes.</p></article>
+        <article><span>02</span><h3>Observer</h3><p>Identifier les deux solides, le point O et le repère local.</p></article>
+        <article><span>03</span><h3>Manipuler</h3><p>Tester chaque translation et rotation. Distinguer autorisé et bloqué.</p></article>
+        <article><span>04</span><h3>Valider</h3><p>Répondre à une mission, recevoir un retour et recommencer.</p></article>
+      </div>
+      <section class="flash panel" aria-labelledby="flashTitle">
+        <div><span class="eyebrow dark">RITUEL MÉMOIRE • 2 MINUTES</span><h2 id="flashTitle">Quel mouvement représente Rz ?</h2><p>Essaie avant de consulter le rappel.</p></div>
+        <div class="flash-controls">
+          <button type="button" class="btn outline dark-outline" id="flashButton">Afficher la réponse</button>
+          <p id="flashAnswer" class="answer" hidden>Rz désigne une rotation autour de l’axe Z. Ce n’est pas une translation suivant Z.</p>
+        </div>
+      </section>
+    </section>
+    <section id="view-catalog" class="view" hidden>
+      <div class="page-heading"><span class="eyebrow dark">BIBLIOTHÈQUE MÉCANIQUE</span><h1>Explorer les liaisons</h1><p>Choisis une liaison, puis expérimente les six mouvements dans le repère local OXYZ.</p></div>
+      <div class="toolbar"><label for="search">Rechercher une liaison</label><input id="search" type="search" placeholder="Pivot, glissière, rotule…"><span id="resultsCount" aria-live="polite"></span></div>
+      <div id="jointGrid" class="joint-grid"></div>
+    </section>
+    <section id="view-detail" class="view" hidden>
+      <div class="breadcrumbs"><button id="backCatalog" type="button">← Toutes les liaisons</button><span id="jointOrdinal"></span></div>
+      <div class="page-heading detail-heading"><div><span id="jointCategory" class="eyebrow dark">FICHE DE DÉCOUVERTE</span><h1 id="jointName">Liaison pivot</h1><p id="jointSubtitle"></p></div><span class="ddl-count" id="jointDdl">1 DDL</span></div>
+      <div class="detail-layout">
+        <div class="panel simulator">
+          <div class="panel-head"><strong>Manipulation cinématique</strong><span>Solide 1 = bleu • Solide 2 = orange</span></div>
+          <div class="sim-stage">
+            <svg id="simSvg" viewBox="0 0 620 350" role="img" aria-label="Visualisation cinématique avec repère X Y Z"></svg>
+            <div class="sim-label">Repère local <b>O, X, Y, Z</b></div>
+          </div>
+          <p id="motionMessage" class="sim-message" aria-live="polite">Sélectionne un mouvement pour essayer.</p>
+          <div class="motion-buttons" id="motionButtons" aria-label="Tester les six mouvements"></div>
+          <div class="sim-footer"><button class="btn outline dark-outline" type="button" id="resetMotion">Réinitialiser</button><span id="axisNotice">Axes orientés dans le repère local</span></div>
+        </div>
+        <aside class="detail-side">
+          <div class="panel">
+            <span class="eyebrow dark">SITUATION D'ATELIER</span>
+            <h2 id="situationTitle"></h2>
+            <p id="situationText"></p>
+            <h3>Objectif</h3><p id="objectiveText"></p>
+          </div>
+          <div class="panel">
+            <h2>Identifier les mobilités</h2>
+            <p class="muted">1 = mouvement possible • 0 = mouvement bloqué. Pour l'hélicoïdale, les deux mouvements sont couplés.</p>
+            <div class="mobility-matrix" id="mobilityMatrix"></div>
+            <div class="ddl-note" id="ddlNote"></div>
+          </div>
+        </aside>
+      </div>
+      <div class="panel learning-panel"><div><span class="eyebrow dark">FORMALISER</span><h2>Du mécanisme au modèle</h2><p id="modelText"></p><p id="formulaText"></p><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Valider avec un défi →</button></div>
+    </section>
+    <section id="view-challenge" class="view" hidden>
+      <div class="page-heading"><span class="eyebrow dark">ÉVALUATION FORMATIVE</span><h1>Défis atelier</h1><p>Identifie les mouvements possibles, sans regarder la solution. Une réponse expliquée vaut mieux qu'un clic au hasard.</p></div>
+      <div class="challenge-layout">
+        <section class="panel challenge-main" aria-labelledby="questionTitle">
+          <div class="challenge-progress"><span id="quizStep">QUESTION 1 / 3</span><span id="quizLabel"></span></div>
+          <div class="quiz-bar"><div id="quizBar"></div></div>
+          <span class="eyebrow dark" id="quizContext"></span>
+          <h2 id="questionTitle"></h2>
+          <p id="questionHelp" class="muted"></p>
+          <form id="quizForm"><div id="quizOptions" class="quiz-options"></div><button class="btn primary" type="submit" id="quizSubmit">Vérifier ma réponse</button></form>
+          <div id="quizFeedback" class="quiz-feedback" role="status" hidden></div>
+          <button class="btn outline dark-outline" id="nextQuestion" type="button" hidden>Question suivante →</button>
+          <div id="quizFinal" hidden></div>
+        </section>
+        <aside class="panel challenge-aside">
+          <span class="eyebrow dark">RAPPEL DE MÉTHODE</span><h2>Avant de répondre</h2>
+          <ol><li>Je nomme les deux solides.</li><li>Je place le repère OXYZ.</li><li>Je teste les translations Tx, Ty, Tz.</li><li>Je teste les rotations Rx, Ry, Rz.</li><li>Je compte les mouvements <strong>indépendants</strong>.</li></ol>
+          <p class="small-note">Un axe et un repère cohérents sont indispensables. Un hélicoïdal comporte deux mouvements liés pour une seule mobilité indépendante.</p>
+          <button class="btn outline dark-outline full" id="newChallenge" type="button">Nouveau défi</button>
+        </aside>
+      </div>
+    </section>
+    <section id="view-teacher" class="view" hidden>
+      <div class="page-heading"><span class="eyebrow dark">RESSOURCES / ENSEIGNEMENT</span><h1>Préparer une séance</h1><p>Utilisation en classe, en autonomie ou projetée au vidéoprojecteur.</p></div>
+      <div class="resource-grid">
+        <article class="panel"><h2>Objectifs pédagogiques</h2><p>Identifier deux solides, définir un repère local, reconnaître les translations et rotations et déterminer les mobilités autorisées et indépendantes.</p><h3>Prérequis</h3><p>Solide, axe, point, translation, rotation et repérage dans l'espace.</p><h3>Critères de réussite</h3><p>Repère orienté, mouvement relatif explicité, DDL justifié, vocabulaire maîtrisé.</p></article>
+        <article class="panel"><h2>Déroulement conseillé</h2><ol><li>Rituel de réactivation : 2 min.</li><li>Démonstration projetée : 5 min.</li><li>Exploration guidée : 10 min.</li><li>Manipulation autonome : 15 min.</li><li>Défi et correction active : 10 min.</li><li>Synthèse : 5 min.</li></ol><p>La durée indicative de 47 minutes est adaptable aux CAP, Bac Pro et BTS.</p></article>
+        <article class="panel"><h2>Progression et confidentialité</h2><p>Les réussites sont enregistrées uniquement sur cet appareil via le stockage local du navigateur. Aucun nom, mot de passe, compte élève ou donnée de classe n'est demandé.</p><button type="button" id="exportProgress" class="btn outline dark-outline full">Exporter mon bilan (.txt)</button><button type="button" id="clearProgress" class="text-button">Réinitialiser ma progression locale</button><p id="exportStatus" role="status" class="muted"></p></article>
+        <article class="panel"><h2>Références documentaires</h2><p>Illustrations animées : schémas didactiques, non symboles normalisés certifiés. La norme de référence relative aux symboles cinématiques est ISO 3952-1:1981 (confirmée en 2024).</p><p><a href="https://www.iso.org/standard/9603.html" target="_blank" rel="noopener">ISO 3952-1 — fiche officielle</a></p><p><a href="https://sti.eduscol.education.fr/ressources_pedagogiques/schema-cinematiquecom" target="_blank" rel="noopener">Éduscol — schéma cinématique</a></p><p><a href="https://www.boutique.afnor.org/fr-fr/norme/nf-en-iso-39521/schemas-cinematiques-symboles-graphiques-partie-1/fa036838/6745" target="_blank" rel="noopener">AFNOR — NF EN ISO 3952-1</a></p></article>
+      </div>
+    </section>
+  </main>
+  <footer><div class="footer-inner"><b>SI-LIAISONS</b><span>© Ressource pédagogique — Sciences industrielles / Maintenance</span><span>Version 0.1 • Découverte interactive</span></div></footer>
+  <script src="./app.js" defer></script>
+</body>
+</html>
