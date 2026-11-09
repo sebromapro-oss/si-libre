@@ -153,7 +153,8 @@ function render(j,level){
   feedback.textContent=correct?"Choix correct. "+(t.requireReason?"Ta justification reste à faire vérifier par ton professeur.":"Tu as identifié le fonctionnement de la liaison."):"Deuxième essai terminé. Lis et explique la correction.";
   feedback.className="mission-feedback "+(correct?"success":"error");
   corr.hidden=false;corr.innerHTML='<strong>Correction :</strong> '+escapes(t.choices[t.answer])+'. '+escapes(t.explain)+
-   (level==="BTS"?'<p>Trace écrite attendue : repère OXYZ, hypothèses de contact et mobilités indépendantes. Un schéma normalisé doit être vérifié par l’enseignant.</p>':"");
+   (level==="BTS"?'<p>Trace écrite attendue : repère OXYZ, hypothèses de contact et mobilités indépendantes. Un schéma cinématique est à produire sur papier, puis à vérifier avec l’enseignant avant toute référence normative.</p>':"")+
+   '<button type="button" class="btn primary" id="missionToQuiz">Passer au défi de mon niveau →</button>';
   form.querySelectorAll('input[name="missionAnswer"]').forEach(i=>i.disabled=true);
   if(reason)reason.readOnly=true;form.querySelector("button").disabled=true;
  });
