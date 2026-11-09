@@ -71,7 +71,7 @@ function miniSvg(j){
 function renderCatalog(){
  if(window.SI_TRACKS){
   const l=window.SI_TRACKS.levels[s.level];
-  $('trackCatalogSummary').innerHTML='<h2>'+esc(l.name)+' · '+esc(l.phase)+'</h2><p><strong>Objectif :</strong> '+esc(l.objective)+'</p><p><strong>Prérequis :</strong> '+esc(l.prereq)+'</p><p><strong>Critère de réussite :</strong> '+esc(l.criteria)+'</p><p><strong>Mission :</strong> '+esc(l.action)+' · '+esc(l.duration)+' (indicatif)</p>';
+  $('trackCatalogSummary').innerHTML='<h2>'+esc(l.name)+' · '+esc(l.phase)+'</h2><p><strong>Objectif :</strong> '+esc(l.objective)+'</p><p><strong>Prérequis :</strong> '+esc(l.prereq)+'</p><p><strong>Critère de réussite :</strong> '+esc(l.criteria)+'</p><p><strong>Mission :</strong> '+esc(l.action)+' · '+esc(l.duration)+' (indicatif)</p>'+(s.level==='CAP'?'<p><strong>Ordre conseillé :</strong> commencer par encastrement, pivot, glissière et hélicoïdale. Les autres liaisons sont en approfondissement.</p>':s.level==='BAC'?'<p><strong>Démarche :</strong> observer le symptôme, proposer un contrôle puis justifier.</p>':'<p><strong>Démarche :</strong> expliciter le repère, les contraintes, les DDL indépendants et produire une trace écrite.</p>');
  }
  const query=$('search').value.trim().toLowerCase();
  const list=offered().filter(j=> (j.name+' '+j.work).toLowerCase().includes(query));
@@ -290,7 +290,7 @@ function exportProgress(){
  const lines=['SI-LIAISONS - Bilan formatif local','Date : '+new Date().toLocaleDateString('fr-FR'),'Parcours : '+s.level,'Points du parcours : '+(saved.trackPoints[s.level]||0),'Défis réussis du parcours :'];
  JOINTS.filter(j=>saved.trackDone[s.level+':'+j.id]).forEach(j=>lines.push('- '+j.name));
  if(!JOINTS.some(j=>saved.trackDone[s.level+':'+j.id]))lines.push('(aucun)');
- lines.push('Ancien historique V4 non attribuable à un diplôme : '+Object.keys(saved.done).length+' liaison(s), '+(saved.score||0)+' points globaux.');
+ lines.push('Ancien historique non attribuable à un diplôme : '+Object.keys(saved.done).length+' liaison(s). Cumul général (ancien et nouveau) : '+(saved.score||0)+' points.');
  lines.push('Ce bilan formatif ne valide aucune compétence officielle.');
  const data=new Blob([lines.join('\n')+'\n'],{type:'text/plain;charset=utf-8'});
  const url=URL.createObjectURL(data),a=document.createElement('a');a.href=url;a.download='SI-LIAISONS-bilan.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);
