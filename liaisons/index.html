@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./motion.css">
   <link rel="stylesheet" href="./learning.css">
+  <link rel="stylesheet" href="./scene-docs.css">
 </head>
 <body>
   <a class="skip" href="#contenu">Aller au contenu</a>
@@ -114,6 +115,7 @@
         <div><span class="eyebrow dark" id="stepLabel">ÉTAPE 1 • OBSERVER</span><h2 id="stepTitle">Observer la situation d'atelier</h2><p id="stepDescription">Identifie les deux solides puis localise l'axe ou le centre de la liaison.</p></div>
         <button type="button" id="stepNext" class="btn primary">Passer à la manipulation →</button>
       </section>
+      <section id="fieldPhoto" class="field-photo panel" aria-label="Observer un mécanisme réel" hidden></section>
       <div class="detail-layout">
         <div class="panel simulator">
           <div class="panel-head"><strong>ATELIER DE MOUVEMENT • 3D</strong><span>Bleu = solide 1 fixe • Orange = solide 2 mobile</span></div>
@@ -144,7 +146,8 @@
           </div>
         </aside>
       </div>
-      <div class="panel learning-panel" id="learningPanel" hidden><div><span class="eyebrow dark">FORMALISER</span><h2>Du mécanisme au modèle</h2><p id="modelText"></p><p id="formulaText"></p><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Valider avec un défi →</button></div>
+      <div class="panel learning-panel" id="learningPanel" hidden><div><span class="eyebrow dark">FORMALISER</span><h2>Du mécanisme au modèle</h2><p id="modelText"></p><p id="formulaText"></p>
+          <div id="referenceDiagram" class="reference-diagram"></div><p class="muted">Les illustrations interactives expliquent la mobilité. Elles ne remplacent pas un symbole cinématique normalisé vérifié.</p></div><button class="btn primary" id="detailChallenge" type="button">Valider avec un défi →</button></div>
     </section>
     <section id="view-challenge" class="view" hidden>
       <div class="page-heading"><span class="eyebrow dark">ÉVALUATION FORMATIVE</span><h1>Défis atelier</h1><p>Identifie les mouvements possibles, sans regarder la solution. Une réponse expliquée vaut mieux qu'un clic au hasard.</p></div>
@@ -180,6 +183,7 @@
   </main>
   <footer><div class="footer-inner"><b>SI-LIAISONS</b><span>© Ressource pédagogique — Sciences industrielles / Maintenance</span><span>Version 0.1 • Découverte interactive</span></div></footer>
   <script src="./motion-engine.js" defer></script>
+  <script src="./scene-docs.js" defer></script>
   <script src="./app.js" defer></script>
 </body>
 </html>
